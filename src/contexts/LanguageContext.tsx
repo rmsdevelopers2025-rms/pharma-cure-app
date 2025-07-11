@@ -13,7 +13,15 @@ export const languages = {
   nl: 'Dutch',
   ja: 'Japanese',
   zh: 'Chinese',
-  de: 'German'
+  de: 'German',
+  fr: 'French',
+  pt: 'Portuguese',
+  ru: 'Russian',
+  ar: 'Arabic',
+  it: 'Italian',
+  ko: 'Korean',
+  th: 'Thai',
+  vi: 'Vietnamese'
 };
 
 export const translations = {
@@ -43,7 +51,14 @@ export const translations = {
     dosageForms: 'Dosage Forms',
     disorders: 'Disorders',
     incompatibility: 'Drug Incompatibility',
-    voiceSearch: 'Voice Search'
+    voiceSearch: 'Voice Search',
+    reminders: 'Drug Reminders',
+    addReminder: 'Add Reminder',
+    autoCorrect: 'Auto-correct enabled',
+    composition: 'Composition',
+    brands: 'Brands',
+    searchPlaceholder: 'Search for drugs, side effects, dosage...',
+    didYouMean: 'Did you mean'
   },
   ta: {
     slogan: 'விழுங்குவதற்கு முன் கற்றுக்கொள்ளுங்கள்',
@@ -71,9 +86,51 @@ export const translations = {
     dosageForms: 'மருந்து வடிவங்கள்',
     disorders: 'கோளாறுகள்',
     incompatibility: 'மருந்து பொருந்தாமை',
-    voiceSearch: 'குரல் தேடல்'
+    voiceSearch: 'குரல் தேடல்',
+    reminders: 'மருந்து நினைவூட்டல்கள்',
+    addReminder: 'நினைவூட்டல் சேர்க்க',
+    autoCorrect: 'தானியங்கி திருத்தம் இயக்கப்பட்டது',
+    composition: 'கலவை',
+    brands: 'பிராண்டுகள்',
+    searchPlaceholder: 'மருந்துகள், பக்க விளைவுகள், மருந்தளவு தேடுங்கள்...',
+    didYouMean: 'நீங்கள் சொல்ல நினைத்தது'
+  },
+  hi: {
+    slogan: 'निगलने से पहले सीखें',
+    getStarted: 'शुरू करें',
+    signUp: 'साइन अप करें',
+    signIn: 'साइन इन करें',
+    name: 'नाम',
+    age: 'उम्र',
+    height: 'ऊंचाई',
+    weight: 'वजन',
+    sex: 'लिंग',
+    address: 'पता',
+    medicalInfo: 'चिकित्सा जानकारी',
+    password: 'पासवर्ड',
+    search: 'खोजें',
+    profile: 'प्रोफ़ाइल',
+    recentHistory: 'हाल का इतिहास',
+    nearbyPharmacies: 'नजदीकी दवाखाने',
+    prescription: 'नुस्खा',
+    premium: 'प्रीमियम',
+    male: 'पुरुष',
+    female: 'महिला',
+    other: 'अन्य',
+    sideEffects: 'दुष्प्रभाव',
+    dosageForms: 'खुराक के रूप',
+    disorders: 'विकार',
+    incompatibility: 'दवा असंगति',
+    voiceSearch: 'आवाज खोज',
+    reminders: 'दवा रिमाइंडर',
+    addReminder: 'रिमाइंडर जोड़ें',
+    autoCorrect: 'ऑटो-करेक्ट सक्षम',
+    composition: 'संरचना',
+    brands: 'ब्रांड्स',
+    searchPlaceholder: 'दवाएं, दुष्प्रभाव, खुराक खोजें...',
+    didYouMean: 'क्या आपका मतलब था'
   }
-  // Add more languages as needed
+  // Add more language translations as needed
 };
 
 interface LanguageContextType {

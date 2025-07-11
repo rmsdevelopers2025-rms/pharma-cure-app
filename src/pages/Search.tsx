@@ -1,40 +1,57 @@
 
 import { useState, useEffect } from 'react';
-import { Search as SearchIcon, Mic, Volume2, Shield, AlertTriangle, Crown } from 'lucide-react';
+import { Search as SearchIcon, Mic, Volume2, Shield, AlertTriangle, Crown, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
+import { drugDatabase, searchDrugs, getAutoCorrectSuggestion, Drug } from '@/data/drugDatabase';
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isListening, setIsListening] = useState(false);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<Drug[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [autoCorrectSuggestion, setAutoCorrectSuggestion] = useState<string | null>(null);
+  const [showAutoCorrect, setShowAutoCorrect] = useState(false);
   const { t } = useLanguage();
-
-  // Mock drug database for auto-suggestions
-  const drugDatabase = [
-    'Paracetamol', 'Aspirin', 'Ibuprofen', 'Amoxicillin', 'Metformin',
-    'Lisinopril', 'Atorvastatin', 'Omeprazole', 'Amlodipine', 'Simvastatin',
-    'Levothyroxine', 'Azithromycin', 'Hydrochlorothiazide', 'Prednisone', 'Gabapentin',
-    'Clopidogrel', 'Warfarin', 'Insulin', 'Losartan', 'Albuterol',
-    'Furosemide', 'Tramadol', 'Ciprofloxacin', 'Doxycycline', 'Citalopram'
-  ];
 
   useEffect(() => {
     if (searchQuery.length > 0) {
+      // Get suggestions
       const filteredSuggestions = drugDatabase
-        .filter(drug => drug.toLowerCase().includes(searchQuery.toLowerCase()))
-        .slice(0, 5);
+        .filter(drug => 
+          drug.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          drug.brands.some(brand => brand.toLowerCase().includes(searchQuery.toLowerCase()))
+        )
+        .slice(0, 5)
+        .map(drug => drug.name);
+      
       setSuggestions(filteredSuggestions);
       setShowSuggestions(true);
+
+      // Check for auto-correct
+      if (filteredSuggestions.length === 0) {
+        const correction = getAutoCorrectSuggestion(searchQuery);
+        if (correction && correction.toLowerCase() !== searchQuery.toLowerCase()) {
+          setAutoCorrectSuggestion(correction);
+          setShowAutoCorrect(true);
+        } else {
+          setAutoCorrectSuggestion(null);
+          setShowAutoCorrect(false);
+        }
+      } else {
+        setAutoCorrectSuggestion(null);
+        setShowAutoCorrect(false);
+      }
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
+      setAutoCorrectSuggestion(null);
+      setShowAutoCorrect(false);
     }
   }, [searchQuery]);
 
@@ -42,26 +59,24 @@ const Search = () => {
     const searchTerm = query || searchQuery;
     if (!searchTerm) return;
 
-    // Mock search results
-    const mockResults = [
-      {
-        name: searchTerm,
-        brands: ['Brand A', 'Brand B', 'Brand C'],
-        sideEffects: ['Nausea', 'Stomach pain', 'Headache'],
-        dosageForms: ['Tablet', 'Syrup', 'Injection'],
-        disorders: ['Pain', 'Fever', 'Inflammation'],
-        incompatibility: ['Alcohol', 'Other medications'],
-        isPremium: Math.random() > 0.5
-      }
-    ];
-    setSearchResults(mockResults);
+    const results = searchDrugs(searchTerm);
+    setSearchResults(results);
     setShowSuggestions(false);
+    setShowAutoCorrect(false);
   };
 
   const handleSuggestionClick = (suggestion: string) => {
     setSearchQuery(suggestion);
     setShowSuggestions(false);
     handleSearch(suggestion);
+  };
+
+  const handleAutoCorrectClick = () => {
+    if (autoCorrectSuggestion) {
+      setSearchQuery(autoCorrectSuggestion);
+      setShowAutoCorrect(false);
+      handleSearch(autoCorrectSuggestion);
+    }
   };
 
   const handleVoiceSearch = () => {
@@ -95,11 +110,14 @@ const Search = () => {
                 <div className="relative flex-1">
                   <Input
                     type="text"
-                    placeholder="Search for drugs, side effects, dosage..."
+                    placeholder={t('searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => searchQuery.length > 0 && setShowSuggestions(true)}
-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    onBlur={() => setTimeout(() => {
+                      setShowSuggestions(false);
+                      setShowAutoCorrect(false);
+                    }, 200)}
                     className="pr-12"
                   />
                   <Button
@@ -118,8 +136,28 @@ const Search = () => {
                 </Button>
               </div>
 
+              {/* Auto-correct suggestion */}
+              {showAutoCorrect && autoCorrectSuggestion && (
+                <div className="absolute top-full left-0 right-12 bg-yellow-50 border border-yellow-200 rounded-md shadow-lg z-10 mt-1 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-yellow-800">
+                      {t('didYouMean')}: <strong>{autoCorrectSuggestion}</strong>?
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleAutoCorrectClick}
+                      className="ml-2 border-yellow-400 text-yellow-800 hover:bg-yellow-100"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-1" />
+                      Yes
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Auto-suggestions dropdown */}
-              {showSuggestions && suggestions.length > 0 && (
+              {showSuggestions && suggestions.length > 0 && !showAutoCorrect && (
                 <div className="absolute top-full left-0 right-12 bg-white border border-gray-200 rounded-md shadow-lg z-10 mt-1">
                   {suggestions.map((suggestion, index) => (
                     <div
@@ -137,6 +175,13 @@ const Search = () => {
             {isListening && (
               <p className="text-sm text-blue-600 text-center">🎤 Listening... Speak now</p>
             )}
+
+            <div className="mt-4 text-center">
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                <CheckCircle className="w-3 h-3 mr-1" />
+                {t('autoCorrect')}
+              </Badge>
+            </div>
           </div>
 
           {/* Search Results */}
@@ -146,7 +191,10 @@ const Search = () => {
                 <Card key={index} className="overflow-hidden">
                   <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl font-bold">{drug.name}</CardTitle>
+                      <div>
+                        <CardTitle className="text-xl font-bold">{drug.name}</CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">Generic: {drug.genericName}</p>
+                      </div>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -156,10 +204,27 @@ const Search = () => {
                         <Volume2 className="w-4 h-4" />
                       </Button>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {drug.brands.map((brand: string, i: number) => (
-                        <Badge key={i} variant="secondary">{brand}</Badge>
-                      ))}
+                    
+                    {/* Composition */}
+                    <div className="mt-3">
+                      <h4 className="font-semibold text-sm mb-2">{t('composition')}</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {drug.composition.map((comp, i) => (
+                          <Badge key={i} variant="outline" className="bg-blue-50 text-blue-800">
+                            {comp.activeIngredient} {comp.strength}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Brands */}
+                    <div className="mt-3">
+                      <h4 className="font-semibold text-sm mb-2">{t('brands')}</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {drug.brands.map((brand, i) => (
+                          <Badge key={i} variant="secondary">{brand}</Badge>
+                        ))}
+                      </div>
                     </div>
                   </CardHeader>
                   
@@ -171,7 +236,7 @@ const Search = () => {
                         {t('sideEffects')}
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {drug.sideEffects.map((effect: string, i: number) => (
+                        {drug.sideEffects.map((effect, i) => (
                           <Badge key={i} variant="destructive" className="bg-red-100 text-red-800">
                             {effect}
                           </Badge>
@@ -186,7 +251,7 @@ const Search = () => {
                         {t('dosageForms')}
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {drug.dosageForms.map((form: string, i: number) => (
+                        {drug.dosageForms.map((form, i) => (
                           <Badge key={i} variant="outline" className="bg-green-50 text-green-800">
                             {form}
                           </Badge>
@@ -206,7 +271,7 @@ const Search = () => {
                           <h4 className="font-medium text-sm text-yellow-800">{t('disorders')}</h4>
                           {drug.isPremium ? (
                             <div className="flex flex-wrap gap-2 mt-1">
-                              {drug.disorders.map((disorder: string, i: number) => (
+                              {drug.disorders.map((disorder, i) => (
                                 <Badge key={i} variant="outline" className="bg-yellow-100 text-yellow-800">
                                   {disorder}
                                 </Badge>
@@ -221,7 +286,7 @@ const Search = () => {
                           <h4 className="font-medium text-sm text-yellow-800">{t('incompatibility')}</h4>
                           {drug.isPremium ? (
                             <div className="flex flex-wrap gap-2 mt-1">
-                              {drug.incompatibility.map((incomp: string, i: number) => (
+                              {drug.incompatibility.map((incomp, i) => (
                                 <Badge key={i} variant="destructive" className="bg-red-100 text-red-800">
                                   {incomp}
                                 </Badge>
@@ -237,6 +302,23 @@ const Search = () => {
                 </Card>
               ))}
             </div>
+          )}
+
+          {searchResults.length === 0 && searchQuery && (
+            <Card className="text-center py-8">
+              <CardContent>
+                <p className="text-gray-600">No results found for "{searchQuery}"</p>
+                {autoCorrectSuggestion && (
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={handleAutoCorrectClick}
+                  >
+                    Search for "{autoCorrectSuggestion}" instead?
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
