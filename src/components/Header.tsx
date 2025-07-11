@@ -16,10 +16,16 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/dashboard" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-              <span className="font-bold text-blue-600 text-xl">PC</span>
+            <div className="w-10 h-10 flex items-center justify-center">
+              <img 
+                src="/lovable-uploads/4b1f1089-469a-4f61-8701-3f77e1ab4d9c.png" 
+                alt="PC" 
+                className="w-8 h-8 object-contain"
+              />
             </div>
-            <span className="font-bold text-xl hidden sm:block">Pharma Cure</span>
+            <span className="font-bold text-xl hidden sm:block bg-gradient-to-r from-cyan-200 to-green-200 bg-clip-text text-transparent">
+              PharmaCure
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

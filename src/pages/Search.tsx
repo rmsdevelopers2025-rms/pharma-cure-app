@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search as SearchIcon, Mic, Volume2, Shield, AlertTriangle, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,31 +12,56 @@ const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const { t } = useLanguage();
 
-  const handleSearch = () => {
+  // Mock drug database for auto-suggestions
+  const drugDatabase = [
+    'Paracetamol', 'Aspirin', 'Ibuprofen', 'Amoxicillin', 'Metformin',
+    'Lisinopril', 'Atorvastatin', 'Omeprazole', 'Amlodipine', 'Simvastatin',
+    'Levothyroxine', 'Azithromycin', 'Hydrochlorothiazide', 'Prednisone', 'Gabapentin',
+    'Clopidogrel', 'Warfarin', 'Insulin', 'Losartan', 'Albuterol',
+    'Furosemide', 'Tramadol', 'Ciprofloxacin', 'Doxycycline', 'Citalopram'
+  ];
+
+  useEffect(() => {
+    if (searchQuery.length > 0) {
+      const filteredSuggestions = drugDatabase
+        .filter(drug => drug.toLowerCase().includes(searchQuery.toLowerCase()))
+        .slice(0, 5);
+      setSuggestions(filteredSuggestions);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchQuery]);
+
+  const handleSearch = (query?: string) => {
+    const searchTerm = query || searchQuery;
+    if (!searchTerm) return;
+
     // Mock search results
     const mockResults = [
       {
-        name: 'Paracetamol',
-        brands: ['Tylenol', 'Panadol', 'Crocin'],
-        sideEffects: ['Nausea', 'Stomach pain', 'Liver damage (overdose)'],
+        name: searchTerm,
+        brands: ['Brand A', 'Brand B', 'Brand C'],
+        sideEffects: ['Nausea', 'Stomach pain', 'Headache'],
         dosageForms: ['Tablet', 'Syrup', 'Injection'],
-        disorders: ['Fever', 'Pain', 'Headache'],
-        incompatibility: ['Alcohol', 'Warfarin'],
-        isPremium: false
-      },
-      {
-        name: 'Aspirin',
-        brands: ['Bayer', 'Disprin', 'Ecosprin'],
-        sideEffects: ['Stomach bleeding', 'Heartburn', 'Allergic reactions'],
-        dosageForms: ['Tablet', 'Capsule', 'Chewable tablet'],
-        disorders: ['Heart attack prevention', 'Stroke prevention', 'Pain'],
-        incompatibility: ['Warfarin', 'Methotrexate'],
-        isPremium: true
+        disorders: ['Pain', 'Fever', 'Inflammation'],
+        incompatibility: ['Alcohol', 'Other medications'],
+        isPremium: Math.random() > 0.5
       }
     ];
     setSearchResults(mockResults);
+    setShowSuggestions(false);
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchQuery(suggestion);
+    setShowSuggestions(false);
+    handleSearch(suggestion);
   };
 
   const handleVoiceSearch = () => {
@@ -44,7 +69,7 @@ const Search = () => {
     setTimeout(() => {
       setIsListening(false);
       setSearchQuery('Paracetamol');
-      handleSearch();
+      handleSearch('Paracetamol');
     }, 2000);
   };
 
@@ -65,29 +90,48 @@ const Search = () => {
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h1 className="text-2xl font-bold mb-6 text-center">{t('search')} Drug Information</h1>
             
-            <div className="flex gap-2 mb-4">
-              <div className="relative flex-1">
-                <Input
-                  type="text"
-                  placeholder="Search for drugs, side effects, dosage..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-12"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 ${isListening ? 'text-red-500 animate-pulse' : 'text-gray-500'}`}
-                  onClick={handleVoiceSearch}
-                >
-                  <Mic className="w-4 h-4" />
+            <div className="relative">
+              <div className="flex gap-2 mb-4">
+                <div className="relative flex-1">
+                  <Input
+                    type="text"
+                    placeholder="Search for drugs, side effects, dosage..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => searchQuery.length > 0 && setShowSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    className="pr-12"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 ${isListening ? 'text-red-500 animate-pulse' : 'text-gray-500'}`}
+                    onClick={handleVoiceSearch}
+                  >
+                    <Mic className="w-4 h-4" />
+                  </Button>
+                </div>
+                <Button onClick={() => handleSearch()} className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                  <SearchIcon className="w-4 h-4 mr-2" />
+                  {t('search')}
                 </Button>
               </div>
-              <Button onClick={handleSearch} className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                <SearchIcon className="w-4 h-4 mr-2" />
-                {t('search')}
-              </Button>
+
+              {/* Auto-suggestions dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-12 bg-white border border-gray-200 rounded-md shadow-lg z-10 mt-1">
+                  {suggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      <span className="text-sm text-gray-700">{suggestion}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             
             {isListening && (

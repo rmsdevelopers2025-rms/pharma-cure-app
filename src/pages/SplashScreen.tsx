@@ -24,17 +24,21 @@ const SplashScreen = () => {
       <div className="text-center text-white">
         {/* Logo */}
         <div className="mb-8 animate-pulse">
-          <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl">
-            <span className="font-bold text-6xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              PC
-            </span>
+          <div className="w-40 h-40 mx-auto mb-6 relative">
+            <img 
+              src="/lovable-uploads/4b1f1089-469a-4f61-8701-3f77e1ab4d9c.png" 
+              alt="Pharma Cure Logo" 
+              className="w-full h-full object-contain drop-shadow-2xl"
+            />
           </div>
-          <h1 className="text-4xl font-bold mb-2">Pharma Cure</h1>
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-cyan-300 via-blue-300 to-green-300 bg-clip-text text-transparent">
+            PharmaCure
+          </h1>
         </div>
 
         {/* Slogan */}
         <div className="text-2xl font-semibold tracking-wide">
-          <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent font-bold">
+          <span className="bg-gradient-to-r from-yellow-300 to-green-300 bg-clip-text text-transparent font-bold drop-shadow-lg">
             {t('slogan')}
           </span>
         </div>
