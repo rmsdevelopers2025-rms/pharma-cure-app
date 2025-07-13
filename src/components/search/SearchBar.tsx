@@ -46,6 +46,12 @@ export default function SearchBar({
     }, 2000);
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      onSearch();
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-8">
       <h1 className="text-2xl font-bold mb-6 text-center">{t('search')} Drug Information</h1>
@@ -58,6 +64,7 @@ export default function SearchBar({
               placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={handleKeyPress}
               onFocus={() => searchQuery.length > 0 && setShowSuggestions(true)}
               onBlur={() => setTimeout(() => {
                 setShowSuggestions(false);

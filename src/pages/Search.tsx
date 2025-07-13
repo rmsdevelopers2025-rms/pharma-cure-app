@@ -15,13 +15,16 @@ const Search = () => {
 
   useEffect(() => {
     if (searchQuery.length > 0) {
-      // Get suggestions
+      // Get suggestions with improved matching
       const filteredSuggestions = drugDatabase
-        .filter(drug => 
-          drug.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          drug.brands.some(brand => brand.toLowerCase().includes(searchQuery.toLowerCase()))
-        )
-        .slice(0, 5)
+        .filter(drug => {
+          const queryLower = searchQuery.toLowerCase();
+          return drug.name.toLowerCase().includes(queryLower) ||
+                 drug.brands.some(brand => brand.toLowerCase().includes(queryLower)) ||
+                 drug.genericName?.toLowerCase().includes(queryLower) ||
+                 drug.composition.some(comp => comp.toLowerCase().includes(queryLower));
+        })
+        .slice(0, 8) // Increased to show more suggestions
         .map(drug => drug.name);
       
       setSuggestions(filteredSuggestions);
