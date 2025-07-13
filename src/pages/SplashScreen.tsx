@@ -20,25 +20,25 @@ const SplashScreen = () => {
   }, [navigate]);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 flex items-center justify-center transition-opacity duration-1000 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-teal-600 flex items-center justify-center transition-opacity duration-1000 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
       <div className="text-center text-white">
         {/* Logo */}
         <div className="mb-8 animate-pulse">
-          <div className="w-40 h-40 mx-auto mb-6 relative">
+          <div className="w-48 h-48 mx-auto mb-6 relative">
             <img 
-              src="/lovable-uploads/4b1f1089-469a-4f61-8701-3f77e1ab4d9c.png" 
-              alt="Pharma Cure Logo" 
+              src="/lovable-uploads/c2a08633-046c-4777-a1c8-0fc700677015.png" 
+              alt="PharmaCure Logo" 
               className="w-full h-full object-contain drop-shadow-2xl"
             />
           </div>
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-cyan-300 via-blue-300 to-green-300 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold mb-4 text-white drop-shadow-lg">
             PharmaCure
           </h1>
         </div>
 
         {/* Slogan */}
-        <div className="text-2xl font-semibold tracking-wide">
-          <span className="bg-gradient-to-r from-yellow-300 to-green-300 bg-clip-text text-transparent font-bold drop-shadow-lg">
+        <div className="text-2xl font-semibold tracking-wide mb-8">
+          <span className="text-green-300 font-bold drop-shadow-lg">
             {t('slogan')}
           </span>
         </div>

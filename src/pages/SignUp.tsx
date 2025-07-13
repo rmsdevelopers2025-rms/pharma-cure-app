@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 
@@ -29,6 +29,7 @@ const SignUp = () => {
     e.preventDefault();
     // Store user data in localStorage for demo
     localStorage.setItem('userData', JSON.stringify(formData));
+    localStorage.setItem('userName', formData.name);
     navigate('/dashboard');
   };
 
@@ -37,45 +38,53 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-lg shadow-2xl p-8">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">{t('signUp')}</h2>
-              <p className="text-gray-600 mt-2">Create your account</p>
+          <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
+            {/* Logo */}
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 mx-auto mb-4">
+                <img 
+                  src="/lovable-uploads/c2a08633-046c-4777-a1c8-0fc700677015.png" 
+                  alt="PharmaCure Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('signUp')}</h2>
+              <p className="text-gray-600">Create your PharmaCure account</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="name">{t('name')}</Label>
+                <Label htmlFor="name" className="text-gray-700 font-medium">{t('name')}</Label>
                 <Input
                   id="name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   required
-                  className="mt-1"
+                  className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="age">{t('age')}</Label>
+                  <Label htmlFor="age" className="text-gray-700 font-medium">{t('age')}</Label>
                   <Input
                     id="age"
                     type="number"
                     value={formData.age}
                     onChange={(e) => handleInputChange('age', e.target.value)}
                     required
-                    className="mt-1"
+                    className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="sex">{t('sex')}</Label>
+                  <Label htmlFor="sex" className="text-gray-700 font-medium">{t('sex')}</Label>
                   <Select value={formData.sex} onValueChange={(value) => handleInputChange('sex', value)}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -89,55 +98,55 @@ const SignUp = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="height">{t('height')} (cm)</Label>
+                  <Label htmlFor="height" className="text-gray-700 font-medium">{t('height')} (cm)</Label>
                   <Input
                     id="height"
                     type="number"
                     value={formData.height}
                     onChange={(e) => handleInputChange('height', e.target.value)}
                     required
-                    className="mt-1"
+                    className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="weight">{t('weight')} (kg)</Label>
+                  <Label htmlFor="weight" className="text-gray-700 font-medium">{t('weight')} (kg)</Label>
                   <Input
                     id="weight"
                     type="number"
                     value={formData.weight}
                     onChange={(e) => handleInputChange('weight', e.target.value)}
                     required
-                    className="mt-1"
+                    className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                   />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="address">{t('address')}</Label>
+                <Label htmlFor="address" className="text-gray-700 font-medium">{t('address')}</Label>
                 <Textarea
                   id="address"
                   value={formData.address}
                   onChange={(e) => handleInputChange('address', e.target.value)}
                   required
-                  className="mt-1"
+                  className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                   rows={2}
                 />
               </div>
 
               <div>
-                <Label htmlFor="medicalInfo">{t('medicalInfo')}</Label>
+                <Label htmlFor="medicalInfo" className="text-gray-700 font-medium">{t('medicalInfo')}</Label>
                 <Textarea
                   id="medicalInfo"
                   value={formData.medicalInfo}
                   onChange={(e) => handleInputChange('medicalInfo', e.target.value)}
-                  className="mt-1"
+                  className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                   rows={3}
                   placeholder="Any allergies, current medications, conditions..."
                 />
               </div>
 
               <div>
-                <Label htmlFor="password">{t('password')}</Label>
+                <Label htmlFor="password" className="text-gray-700 font-medium">{t('password')}</Label>
                 <div className="relative mt-1">
                   <Input
                     id="password"
@@ -145,7 +154,7 @@ const SignUp = () => {
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
                     required
-                    className="pr-10"
+                    className="pr-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                   />
                   <button
                     type="button"
@@ -157,14 +166,14 @@ const SignUp = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
+              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors duration-300 shadow-lg">
                 {t('signUp')}
               </Button>
             </form>
 
             <div className="text-center mt-6">
               <span className="text-sm text-gray-600">Already have an account? </span>
-              <Link to="/signin" className="text-blue-600 hover:text-blue-700 font-semibold">
+              <Link to="/signin" className="text-blue-600 hover:text-blue-700 font-semibold transition-colors">
                 {t('signIn')}
               </Link>
             </div>

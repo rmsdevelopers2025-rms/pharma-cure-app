@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, Search, User, MapPin, Stethoscope } from 'lucide-react';
@@ -25,57 +26,68 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Welcome Section */}
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white rounded-lg p-8 mb-8 shadow-lg">
-            <h1 className="text-3xl font-bold mb-4">
-              {t('getStarted')}, <span className="text-yellow-200">{userName}</span>!
-            </h1>
-            <p className="text-lg">
-              {t('slogan')}
-            </p>
+          <div className="bg-white rounded-2xl p-8 mb-8 shadow-lg border border-gray-200">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-16 h-16">
+                <img 
+                  src="/lovable-uploads/c2a08633-046c-4777-a1c8-0fc700677015.png" 
+                  alt="PharmaCure Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-800">
+                  Welcome back, <span className="text-blue-600">{userName}</span>!
+                </h1>
+                <p className="text-lg text-gray-600 mt-1">
+                  {t('slogan')}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Quick Actions Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Search */}
-            <Link to="/search" className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-4 flex items-center space-x-4">
-              <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
-                <Search className="w-6 h-6" />
+            <Link to="/search" className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex items-center space-x-4 transform hover:-translate-y-1 border border-gray-200">
+              <div className="p-4 bg-blue-100 text-blue-600 rounded-xl">
+                <Search className="w-8 h-8" />
               </div>
               <div>
-                <h3 className="font-semibold">{t('search')}</h3>
+                <h3 className="font-bold text-lg text-gray-800">{t('search')}</h3>
                 <p className="text-sm text-gray-500">Find drug information</p>
               </div>
             </Link>
 
             {/* Profile */}
-            <Link to="/profile" className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-4 flex items-center space-x-4">
-              <div className="p-3 bg-green-100 text-green-600 rounded-full">
-                <User className="w-6 h-6" />
+            <Link to="/profile" className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex items-center space-x-4 transform hover:-translate-y-1 border border-gray-200">
+              <div className="p-4 bg-green-100 text-green-600 rounded-xl">
+                <User className="w-8 h-8" />
               </div>
               <div>
-                <h3 className="font-semibold">{t('profile')}</h3>
+                <h3 className="font-bold text-lg text-gray-800">{t('profile')}</h3>
                 <p className="text-sm text-gray-500">Manage your profile</p>
               </div>
             </Link>
 
             {/* Prescription */}
-            <Link to="/prescription" className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-4 flex items-center space-x-4">
-              <div className="p-3 bg-yellow-100 text-yellow-600 rounded-full">
-                <Stethoscope className="w-6 h-6" />
+            <Link to="/prescription" className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex items-center space-x-4 transform hover:-translate-y-1 border border-gray-200">
+              <div className="p-4 bg-yellow-100 text-yellow-600 rounded-xl">
+                <Stethoscope className="w-8 h-8" />
               </div>
               <div>
-                <h3 className="font-semibold">{t('prescription')}</h3>
-                <p className="text-sm text-gray-500">View your prescriptions</p>
+                <h3 className="font-bold text-lg text-gray-800">{t('prescription')}</h3>
+                <p className="text-sm text-gray-500">View prescriptions</p>
               </div>
             </Link>
 
             {/* Nearby Pharmacies */}
-            <Link to="/nearby-pharmacies" className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-4 flex items-center space-x-4">
-              <div className="p-3 bg-red-100 text-red-600 rounded-full">
-                <MapPin className="w-6 h-6" />
+            <Link to="/nearby-pharmacies" className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex items-center space-x-4 transform hover:-translate-y-1 border border-gray-200">
+              <div className="p-4 bg-red-100 text-red-600 rounded-xl">
+                <MapPin className="w-8 h-8" />
               </div>
               <div>
-                <h3 className="font-semibold">{t('nearbyPharmacies')}</h3>
+                <h3 className="font-bold text-lg text-gray-800">{t('nearbyPharmacies')}</h3>
                 <p className="text-sm text-gray-500">Find nearby pharmacies</p>
               </div>
             </Link>
@@ -89,32 +101,50 @@ const Dashboard = () => {
           {/* Recent Activity and Features */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
+            <Card className="shadow-lg border border-gray-200 rounded-xl">
+              <CardHeader className="bg-gray-50 rounded-t-xl">
+                <CardTitle className="text-xl text-gray-800">Recent Activity</CardTitle>
               </CardHeader>
-              <CardContent className="pl-2">
-                <ul className="list-disc pl-5 text-sm text-gray-600">
-                  <li>Viewed drug information for Paracetamol</li>
-                  <li>Searched for side effects of Amoxicillin</li>
-                  <li>Added a reminder for Metformin at 8:00 AM</li>
+              <CardContent className="p-6">
+                <ul className="space-y-3 text-sm text-gray-600">
+                  <li className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span>Viewed drug information for Paracetamol</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Searched for side effects of Amoxicillin</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <span>Added a reminder for Metformin at 8:00 AM</span>
+                  </li>
                 </ul>
               </CardContent>
             </Card>
 
             {/* Premium Features */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Premium Features</CardTitle>
+            <Card className="shadow-lg border border-gray-200 rounded-xl">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-xl">
+                <CardTitle className="text-xl text-gray-800">Premium Features</CardTitle>
               </CardHeader>
-              <CardContent>
-                <ul className="list-disc pl-5 text-sm text-gray-600">
-                  <li>Advanced drug interaction checker</li>
-                  <li>Personalized health recommendations</li>
-                  <li>Ad-free experience</li>
+              <CardContent className="p-6">
+                <ul className="space-y-3 text-sm text-gray-600">
+                  <li className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span>Advanced drug interaction checker</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span>Personalized health recommendations</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Ad-free experience</span>
+                  </li>
                 </ul>
-                <Link to="/premium" className="inline-block mt-4 text-blue-600 hover:underline">
-                  Explore Premium Features
+                <Link to="/premium" className="inline-block mt-4 text-blue-600 hover:text-blue-700 font-semibold transition-colors">
+                  Explore Premium Features →
                 </Link>
               </CardContent>
             </Card>

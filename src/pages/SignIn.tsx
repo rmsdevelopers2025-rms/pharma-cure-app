@@ -22,39 +22,47 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="container mx-auto px-4 py-8 flex items-center justify-center">
+      <div className="container mx-auto px-4 py-12 flex items-center justify-center">
         <div className="max-w-md w-full">
-          <div className="bg-white rounded-lg shadow-2xl p-8">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">{t('signIn')}</h2>
-              <p className="text-gray-600 mt-2">Welcome back!</p>
+          <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
+            {/* Logo */}
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 mx-auto mb-4">
+                <img 
+                  src="/lovable-uploads/c2a08633-046c-4777-a1c8-0fc700677015.png" 
+                  alt="PharmaCure Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">{t('signIn')}</h2>
+              <p className="text-gray-600">Welcome back to PharmaCure!</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="mt-1"
+                  className="mt-2 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                 />
               </div>
 
               <div>
-                <Label htmlFor="password">{t('password')}</Label>
-                <div className="relative mt-1">
+                <Label htmlFor="password" className="text-gray-700 font-medium">{t('password')}</Label>
+                <div className="relative mt-2">
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pr-10"
+                    className="pr-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                   />
                   <button
                     type="button"
@@ -66,14 +74,14 @@ const SignIn = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
+              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors duration-300 shadow-lg">
                 {t('signIn')}
               </Button>
             </form>
 
-            <div className="text-center mt-6">
+            <div className="text-center mt-8">
               <span className="text-sm text-gray-600">Don't have an account? </span>
-              <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-semibold">
+              <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-semibold transition-colors">
                 {t('signUp')}
               </Link>
             </div>

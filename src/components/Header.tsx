@@ -11,38 +11,38 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-lg">
+    <header className="bg-white shadow-lg border-b border-gray-200">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/dashboard" className="flex items-center space-x-2">
-            <div className="w-10 h-10 flex items-center justify-center">
+          <Link to="/dashboard" className="flex items-center space-x-3">
+            <div className="w-12 h-12 flex items-center justify-center">
               <img 
-                src="/lovable-uploads/4b1f1089-469a-4f61-8701-3f77e1ab4d9c.png" 
-                alt="PC" 
-                className="w-8 h-8 object-contain"
+                src="/lovable-uploads/c2a08633-046c-4777-a1c8-0fc700677015.png" 
+                alt="PharmaCure" 
+                className="w-12 h-12 object-contain"
               />
             </div>
-            <span className="font-bold text-xl hidden sm:block bg-gradient-to-r from-cyan-200 to-green-200 bg-clip-text text-transparent">
+            <span className="font-bold text-2xl hidden sm:block text-blue-700">
               PharmaCure
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-4">
-            <Link to="/search" className="hover:text-blue-200 transition-colors">
+          <nav className="hidden md:flex items-center space-x-6">
+            <Link to="/search" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
               {t('search')}
             </Link>
-            <Link to="/profile" className="hover:text-blue-200 transition-colors">
+            <Link to="/profile" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
               {t('profile')}
             </Link>
-            <Link to="/prescription" className="hover:text-blue-200 transition-colors">
+            <Link to="/prescription" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
               {t('prescription')}
             </Link>
-            <Link to="/nearby-pharmacies" className="hover:text-blue-200 transition-colors">
+            <Link to="/nearby-pharmacies" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
               {t('nearbyPharmacies')}
             </Link>
-            <Link to="/premium" className="hover:text-blue-200 transition-colors">
+            <Link to="/premium" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
               {t('premium')}
             </Link>
           </nav>
@@ -51,7 +51,7 @@ const Header = () => {
           <div className="flex items-center space-x-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50">
                   <Globe className="w-4 h-4 mr-2" />
                   {languages[currentLanguage as keyof typeof languages]}
                 </Button>
@@ -61,7 +61,7 @@ const Header = () => {
                   <DropdownMenuItem
                     key={code}
                     onClick={() => setLanguage(code)}
-                    className={currentLanguage === code ? 'bg-blue-50' : ''}
+                    className={currentLanguage === code ? 'bg-blue-50 text-blue-700' : ''}
                   >
                     {name}
                   </DropdownMenuItem>
@@ -71,9 +71,9 @@ const Header = () => {
 
             {/* Mobile Menu Button */}
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="md:hidden text-white hover:bg-white/20"
+              className="md:hidden text-gray-700 border-gray-300 hover:bg-gray-50"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -83,21 +83,21 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-white/20">
+          <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
             <nav className="flex flex-col space-y-2 pt-4">
-              <Link to="/search" className="hover:text-blue-200 transition-colors py-2">
+              <Link to="/search" className="text-gray-700 hover:text-blue-600 transition-colors py-2 font-medium">
                 {t('search')}
               </Link>
-              <Link to="/profile" className="hover:text-blue-200 transition-colors py-2">
+              <Link to="/profile" className="text-gray-700 hover:text-blue-600 transition-colors py-2 font-medium">
                 {t('profile')}
               </Link>
-              <Link to="/prescription" className="hover:text-blue-200 transition-colors py-2">
+              <Link to="/prescription" className="text-gray-700 hover:text-blue-600 transition-colors py-2 font-medium">
                 {t('prescription')}
               </Link>
-              <Link to="/nearby-pharmacies" className="hover:text-blue-200 transition-colors py-2">
+              <Link to="/nearby-pharmacies" className="text-gray-700 hover:text-blue-600 transition-colors py-2 font-medium">
                 {t('nearbyPharmacies')}
               </Link>
-              <Link to="/premium" className="hover:text-blue-200 transition-colors py-2">
+              <Link to="/premium" className="text-gray-700 hover:text-blue-600 transition-colors py-2 font-medium">
                 {t('premium')}
               </Link>
             </nav>
