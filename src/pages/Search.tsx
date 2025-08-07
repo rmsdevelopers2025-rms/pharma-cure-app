@@ -21,15 +21,9 @@ const Search = () => {
           return drug.name.toLowerCase().includes(queryLower) ||
                  drug.brands.some(brand => brand.toLowerCase().includes(queryLower)) ||
                  drug.genericName?.toLowerCase().includes(queryLower) ||
-                 drug.composition.some(comp => {
-                   // Handle composition as objects with ingredient property
-                   if (typeof comp === 'string') {
-                     return comp.toLowerCase().includes(queryLower);
-                   } else if (comp && typeof comp === 'object' && 'ingredient' in comp) {
-                     return comp.ingredient.toLowerCase().includes(queryLower);
-                   }
-                   return false;
-                 });
+                 drug.composition.some(comp => 
+                   comp.activeIngredient.toLowerCase().includes(queryLower)
+                 );
         })
         .slice(0, 8) // Increased to show more suggestions
         .map(drug => drug.name);

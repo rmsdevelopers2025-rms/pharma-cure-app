@@ -42,7 +42,7 @@ const SignIn = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
+                <Label htmlFor="email" className="text-gray-700 font-medium">Address</Label>
                 <Input
                   id="email"
                   type="email"
