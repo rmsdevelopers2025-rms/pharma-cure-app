@@ -18,7 +18,7 @@ const SignUp = () => {
     height: '',
     weight: '',
     sex: '',
-    address: '',
+    email: '',
     medicalInfo: '',
     password: ''
   });
@@ -122,14 +122,15 @@ const SignUp = () => {
               </div>
 
               <div>
-                <Label htmlFor="address" className="text-gray-700 font-medium">{t('address')}</Label>
-                <Textarea
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
+                <Label htmlFor="email" className="text-gray-700 font-medium">{t('email')}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
                   required
                   className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
-                  rows={2}
+                  placeholder="you@example.com"
                 />
               </div>
 
