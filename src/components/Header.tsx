@@ -1,13 +1,16 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Globe, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useLanguage, languages } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Header = () => {
   const { currentLanguage, setLanguage, t } = useLanguage();
+  const { session, signOut } = useAuth();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -68,6 +71,17 @@ const Header = () => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {session && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden md:inline-flex text-gray-700 border-gray-300 hover:bg-gray-50"
+                onClick={async () => { await signOut(); navigate('/signin'); }}
+              >
+                Logout
+              </Button>
+            )}
 
             {/* Mobile Menu Button */}
             <Button

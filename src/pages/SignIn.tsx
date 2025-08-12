@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,9 +17,18 @@ const SignIn = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) navigate('/dashboard');
+    });
+  }, [navigate]);
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple demo authentication
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      toast({ title: 'Sign in failed', description: error.message });
+      return;
+    }
     navigate('/dashboard');
   };
 
@@ -42,7 +53,7 @@ const SignIn = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <Label htmlFor="email" className="text-gray-700 font-medium">Address</Label>
+                <Label htmlFor="email" className="text-gray-700 font-medium">{t('email')}</Label>
                 <Input
                   id="email"
                   type="email"

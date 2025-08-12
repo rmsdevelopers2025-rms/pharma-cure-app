@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,12 +27,41 @@ const SignUp = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Store user data in localStorage for demo
-    localStorage.setItem('userData', JSON.stringify(formData));
+
+    const redirectUrl = `${window.location.origin}/dashboard`;
+    const { data, error } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          name: formData.name,
+          age: formData.age ? Number(formData.age) : null,
+          height: formData.height ? Number(formData.height) : null,
+          weight: formData.weight ? Number(formData.weight) : null,
+          sex: formData.sex || null,
+          email: formData.email,
+          medicalInfo: formData.medicalInfo || null,
+        },
+      },
+    });
+
+    if (error) {
+      toast({ title: 'Sign up failed', description: error.message });
+      return;
+    }
+
+    // Keep demo welcome name
     localStorage.setItem('userName', formData.name);
-    navigate('/dashboard');
+
+    if (data.user && !data.session) {
+      toast({ title: 'Confirm your email', description: 'Check your inbox to complete sign up.' });
+      navigate('/signin');
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
