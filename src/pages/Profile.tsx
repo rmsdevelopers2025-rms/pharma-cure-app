@@ -20,7 +20,6 @@ const Profile = () => {
       height: '175',
       weight: '70',
       sex: 'male',
-      address: '123 Main St, City',
       medicalInfo: 'No known allergies'
     };
   });
@@ -143,17 +142,6 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="address">{t('address')}</Label>
-                  <Textarea
-                    id="address"
-                    value={userData.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    readOnly={!isEditing}
-                    className={!isEditing ? 'bg-gray-50' : ''}
-                    rows={2}
-                  />
-                </div>
 
                 <div>
                   <Label htmlFor="medicalInfo">{t('medicalInfo')}</Label>
