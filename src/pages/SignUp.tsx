@@ -14,6 +14,7 @@ import { toast } from '@/components/ui/use-toast';
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -27,8 +28,40 @@ const SignUp = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
+  const validatePassword = (password: string) => {
+    if (password.length < 8) {
+      return { strength: 'weak', message: 'Password must be at least 8 characters' };
+    }
+    
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    const score = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChar].filter(Boolean).length;
+    
+    if (score < 2) {
+      return { strength: 'weak', message: 'Password is too weak' };
+    } else if (score < 3) {
+      return { strength: 'medium', message: 'Password strength: Medium' };
+    } else {
+      return { strength: 'strong', message: 'Password strength: Strong' };
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate password strength
+    const passwordValidation = validatePassword(formData.password);
+    if (passwordValidation.strength === 'weak') {
+      toast({ 
+        title: 'Weak password', 
+        description: passwordValidation.message,
+        variant: 'destructive'
+      });
+      return;
+    }
 
     const redirectUrl = `${window.location.origin}/dashboard`;
     const { data, error } = await supabase.auth.signUp({
@@ -66,6 +99,12 @@ const SignUp = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Update password strength indicator
+    if (field === 'password') {
+      const validation = validatePassword(value);
+      setPasswordStrength(validation.strength);
+    }
   };
 
   return (
@@ -186,7 +225,9 @@ const SignUp = () => {
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
                     required
+                    minLength={8}
                     className="pr-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+                    placeholder="At least 8 characters with letters and numbers"
                   />
                   <button
                     type="button"
@@ -196,6 +237,24 @@ const SignUp = () => {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {formData.password && (
+                  <div className="mt-2">
+                    <div className={`text-sm ${
+                      passwordStrength === 'strong' ? 'text-green-600' :
+                      passwordStrength === 'medium' ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                      {validatePassword(formData.password).message}
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                      <div 
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          passwordStrength === 'strong' ? 'bg-green-500 w-full' :
+                          passwordStrength === 'medium' ? 'bg-yellow-500 w-2/3' : 'bg-red-500 w-1/3'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors duration-300 shadow-lg">

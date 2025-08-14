@@ -1,38 +1,132 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Edit, Save, History } from 'lucide-react';
+import { User, Edit, Save, History, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 import Header from '@/components/Header';
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [userData, setUserData] = useState(() => {
-    const saved = localStorage.getItem('userData');
-    return saved ? JSON.parse(saved) : {
-      name: 'John Doe',
-      age: '30',
-      height: '175',
-      weight: '70',
-      sex: 'male',
-      medicalInfo: 'No known allergies'
-    };
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [userData, setUserData] = useState({
+    name: '',
+    age: '',
+    height: '',
+    weight: '',
+    sex: '',
+    medicalInfo: '',
+    email: ''
   });
   
   const { t } = useLanguage();
+  const { user } = useAuth();
 
-  const handleSave = () => {
-    localStorage.setItem('userData', JSON.stringify(userData));
-    setIsEditing(false);
+  useEffect(() => {
+    if (user) {
+      loadUserProfile();
+    }
+  }, [user]);
+
+  const loadUserProfile = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error loading profile:', error);
+        toast({
+          title: 'Error loading profile',
+          description: 'Failed to load your profile data.',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      if (data) {
+        setUserData({
+          name: data.name || '',
+          age: data.age?.toString() || '',
+          height: data.height?.toString() || '',
+          weight: data.weight?.toString() || '',
+          sex: data.sex || '',
+          medicalInfo: data.medical_info || '',
+          email: data.email || user.email || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      toast({
+        title: 'Error loading profile',
+        description: 'Failed to load your profile data.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          name: userData.name || null,
+          age: userData.age ? parseInt(userData.age) : null,
+          height: userData.height ? parseInt(userData.height) : null,
+          weight: userData.weight ? parseInt(userData.weight) : null,
+          sex: userData.sex || null,
+          medical_info: userData.medicalInfo || null,
+          email: userData.email || null
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error saving profile:', error);
+        toast({
+          title: 'Error saving profile',
+          description: 'Failed to save your profile data.',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      toast({
+        title: 'Profile saved',
+        description: 'Your profile has been updated successfully.'
+      });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast({
+        title: 'Error saving profile',
+        description: 'Failed to save your profile data.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setUserData((prev: any) => ({ ...prev, [field]: value }));
+    setUserData((prev) => ({ ...prev, [field]: value }));
   };
 
   const medicalHistory = [
@@ -40,6 +134,22 @@ const Profile = () => {
     { date: '2024-01-10', condition: 'Headache', medication: 'Aspirin' },
     { date: '2024-01-05', condition: 'Cold', medication: 'Cough Syrup' }
   ];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto flex items-center justify-center">
+            <div className="flex items-center space-x-2">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span>Loading profile...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -62,10 +172,17 @@ const Profile = () => {
                 </div>
                 <Button
                   onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                  disabled={isSaving}
                   className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                 >
-                  {isEditing ? <Save className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
-                  {isEditing ? 'Save' : 'Edit'}
+                  {isSaving ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : isEditing ? (
+                    <Save className="w-4 h-4 mr-2" />
+                  ) : (
+                    <Edit className="w-4 h-4 mr-2" />
+                  )}
+                  {isSaving ? 'Saving...' : isEditing ? 'Save' : 'Edit'}
                 </Button>
               </div>
             </CardHeader>
