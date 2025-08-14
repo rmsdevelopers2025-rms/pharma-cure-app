@@ -2,29 +2,116 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, Camera, FileText, Loader2 } from 'lucide-react';
+import { Upload, Camera, FileText, Loader2, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 
 const Prescription = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { toast } = useToast();
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setUploadedFile(file);
-      analyzePresecription(file);
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select an image file",
+        variant: "destructive"
+      });
+      return;
     }
+
+    // Validate file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast({
+        title: "File too large",
+        description: "Please select an image smaller than 5MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploadedFile(file);
+    
+    // Create image preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImagePreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to Supabase Storage and analyze
+    await uploadAndAnalyze(file);
   };
 
   const handleCameraCapture = () => {
-    // Simulate camera capture
-    const mockFile = new File([''], 'camera-capture.jpg', { type: 'image/jpeg' });
-    setUploadedFile(mockFile);
-    analyzePresecription(mockFile);
+    // Create file input programmatically to trigger camera on mobile
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment'; // Use back camera
+    input.onchange = (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        handleFileUpload({ target: { files: [file] } } as any);
+      }
+    };
+    input.click();
+  };
+
+  const uploadAndAnalyze = async (file: File) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to upload prescriptions",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+      // Upload to Supabase Storage
+      const fileName = `${user.id}/${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from('prescriptions')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      toast({
+        title: "Upload successful",
+        description: "Prescription image uploaded successfully"
+      });
+
+      // Analyze prescription
+      analyzePresecription(file);
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload prescription image",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const analyzePresecription = (file: File) => {
@@ -56,6 +143,12 @@ const Prescription = () => {
         ]
       });
     }, 3000);
+  };
+
+  const clearUpload = () => {
+    setUploadedFile(null);
+    setImagePreview(null);
+    setAnalysisResult(null);
   };
 
   return (
@@ -114,16 +207,51 @@ const Prescription = () => {
                   </div>
                 </div>
               ) : (
-                <div className="text-center">
-                  <div className="mb-6">
-                    <FileText className="w-20 h-20 mx-auto text-blue-600 mb-4" />
-                    <p className="font-bold text-lg text-gray-800">{uploadedFile.name}</p>
+                <div className="space-y-6">
+                  {/* Image Preview */}
+                  <div className="relative">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="font-bold text-lg text-gray-800">Uploaded Prescription</h3>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={clearUpload}
+                        className="text-red-600 border-red-300 hover:bg-red-50"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Remove
+                      </Button>
+                    </div>
+                    
+                    {imagePreview ? (
+                      <div className="relative rounded-xl overflow-hidden border border-gray-200 max-w-md mx-auto">
+                        <img 
+                          src={imagePreview} 
+                          alt="Prescription preview" 
+                          className="w-full h-auto object-contain max-h-96"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center p-8 border border-gray-200 rounded-xl">
+                        <FileText className="w-16 h-16 text-gray-400 mb-2" />
+                        <p className="text-gray-600">{uploadedFile.name}</p>
+                      </div>
+                    )}
                   </div>
-                  
-                  {isAnalyzing && (
+
+                  {/* Upload Progress */}
+                  {isUploading && (
                     <div className="flex items-center justify-center space-x-3 bg-blue-50 p-6 rounded-xl">
                       <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                      <span className="text-lg font-medium text-blue-700">Analyzing prescription...</span>
+                      <span className="text-lg font-medium text-blue-700">Uploading prescription...</span>
+                    </div>
+                  )}
+                  
+                  {/* Analysis Progress */}
+                  {isAnalyzing && !isUploading && (
+                    <div className="flex items-center justify-center space-x-3 bg-green-50 p-6 rounded-xl">
+                      <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+                      <span className="text-lg font-medium text-green-700">Analyzing prescription...</span>
                     </div>
                   )}
                 </div>
