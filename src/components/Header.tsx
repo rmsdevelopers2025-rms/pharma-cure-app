@@ -21,7 +21,7 @@ const Header = () => {
           <Link to="/dashboard" className="flex items-center space-x-3">
             <div className="w-12 h-12 flex items-center justify-center">
               <img 
-                src="/lovable-uploads/c2a08633-046c-4777-a1c8-0fc700677015.png" 
+                src="/lovable-uploads/b5751d8a-2aa5-4a0f-98b6-4a3ef09935da.png" 
                 alt="PharmaCure" 
                 className="w-12 h-12 object-contain"
               />
