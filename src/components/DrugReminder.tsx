@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Bell, Plus, Trash2, Clock, Pill } from 'lucide-react';
+import { Bell, Plus, Trash2, Clock, Pill, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +16,7 @@ interface Reminder {
   startDate: string;
   endDate: string;
   notes: string;
+  alarmSound: string;
 }
 
 const DrugReminder = () => {
@@ -28,7 +29,8 @@ const DrugReminder = () => {
     time: ['08:00'],
     startDate: new Date().toISOString().split('T')[0],
     endDate: '',
-    notes: ''
+    notes: '',
+    alarmSound: 'default'
   });
   const { t } = useLanguage();
 
@@ -56,7 +58,8 @@ const DrugReminder = () => {
       time: newReminder.time || ['08:00'],
       startDate: newReminder.startDate || new Date().toISOString().split('T')[0],
       endDate: newReminder.endDate || '',
-      notes: newReminder.notes || ''
+      notes: newReminder.notes || '',
+      alarmSound: newReminder.alarmSound || 'default'
     };
 
     const updatedReminders = [...reminders, reminder];
@@ -69,7 +72,8 @@ const DrugReminder = () => {
       time: ['08:00'],
       startDate: new Date().toISOString().split('T')[0],
       endDate: '',
-      notes: ''
+      notes: '',
+      alarmSound: 'default'
     });
     setShowAddForm(false);
 
@@ -183,13 +187,30 @@ const DrugReminder = () => {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Notes (Optional)</label>
-              <Input
-                value={newReminder.notes || ''}
-                onChange={(e) => setNewReminder(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="Additional notes..."
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Alarm Sound</label>
+                <select
+                  value={newReminder.alarmSound || 'default'}
+                  onChange={(e) => setNewReminder(prev => ({ ...prev, alarmSound: e.target.value }))}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="default">Default Alarm</option>
+                  <option value="bell">Bell</option>
+                  <option value="chime">Chime</option>
+                  <option value="beep">Beep</option>
+                  <option value="tone">Tone</option>
+                  <option value="vibrate">Vibrate Only</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Notes (Optional)</label>
+                <Input
+                  value={newReminder.notes || ''}
+                  onChange={(e) => setNewReminder(prev => ({ ...prev, notes: e.target.value }))}
+                  placeholder="Additional notes..."
+                />
+              </div>
             </div>
 
             <div className="flex space-x-2">
@@ -238,6 +259,19 @@ const DrugReminder = () => {
                     </Badge>
                   ))}
                 </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Volume2 className="w-4 h-4 text-gray-500" />
+                <Badge variant="secondary" className="text-xs">
+                  {reminder.alarmSound === 'default' ? 'Default Alarm' : 
+                   reminder.alarmSound === 'bell' ? 'Bell' :
+                   reminder.alarmSound === 'chime' ? 'Chime' :
+                   reminder.alarmSound === 'beep' ? 'Beep' :
+                   reminder.alarmSound === 'tone' ? 'Tone' :
+                   reminder.alarmSound === 'vibrate' ? 'Vibrate Only' :
+                   'Default Alarm'}
+                </Badge>
               </div>
 
               {reminder.notes && (
