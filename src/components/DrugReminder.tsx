@@ -168,6 +168,18 @@ const DrugReminder = () => {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">End Date (Optional)</label>
+                <Input
+                  type="date"
+                  value={newReminder.endDate || ''}
+                  onChange={(e) => setNewReminder(prev => ({ ...prev, endDate: e.target.value }))}
+                  min={newReminder.startDate}
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2">Reminder Times</label>
               <div className="space-y-2">
