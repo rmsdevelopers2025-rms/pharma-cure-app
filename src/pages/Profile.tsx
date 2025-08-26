@@ -261,6 +261,18 @@ const Profile = () => {
 
 
                 <div>
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
+                    id="email"
+                    value={userData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    readOnly={!isEditing}
+                    className={!isEditing ? 'bg-gray-50' : ''}
+                    type="email"
+                  />
+                </div>
+
+                <div>
                   <Label htmlFor="medicalInfo">{t('medicalInfo')}</Label>
                   <Textarea
                     id="medicalInfo"
@@ -268,7 +280,8 @@ const Profile = () => {
                     onChange={(e) => handleInputChange('medicalInfo', e.target.value)}
                     readOnly={!isEditing}
                     className={!isEditing ? 'bg-gray-50' : ''}
-                    rows={3}
+                    rows={4}
+                    placeholder="Enter any medical conditions, allergies, or important health information..."
                   />
                 </div>
               </CardContent>
