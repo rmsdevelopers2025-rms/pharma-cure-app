@@ -33,6 +33,8 @@ const Profile = () => {
   useEffect(() => {
     if (user) {
       loadUserProfile();
+    } else {
+      setIsLoading(false);
     }
   }, [user]);
 
@@ -41,11 +43,11 @@ const Profile = () => {
     
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error loading profile:', error);
@@ -67,6 +69,12 @@ const Profile = () => {
           medicalInfo: data.medical_info || '',
           email: data.email || user.email || ''
         });
+      } else {
+        toast({
+          title: 'No profile found',
+          description: 'Please complete your profile and save.'
+        });
+        setUserData((prev) => ({ ...prev, email: user.email || '' }));
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -85,7 +93,7 @@ const Profile = () => {
     
     setIsSaving(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({
           name: userData.name || null,
