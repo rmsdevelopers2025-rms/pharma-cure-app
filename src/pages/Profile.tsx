@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import Header from '@/components/Header';
+import type { Tables } from '@/integrations/supabase/types';
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -60,14 +61,15 @@ const Profile = () => {
       }
 
       if (data) {
+        const profile = data as Tables<'profiles'>;
         setUserData({
-          name: data.name || '',
-          age: data.age?.toString() || '',
-          height: data.height?.toString() || '',
-          weight: data.weight?.toString() || '',
-          sex: data.sex || '',
-          medicalInfo: data.medical_info || '',
-          email: data.email || user.email || ''
+          name: profile.name || '',
+          age: profile.age?.toString() || '',
+          height: profile.height?.toString() || '',
+          weight: profile.weight?.toString() || '',
+          sex: profile.sex || '',
+          medicalInfo: profile.medical_info || '',
+          email: profile.email || user.email || ''
         });
       } else {
         toast({
