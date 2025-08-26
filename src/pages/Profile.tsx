@@ -72,11 +72,23 @@ const Profile = () => {
           email: profile.email || user.email || ''
         });
       } else {
+        // No profile found - this could happen for existing users before the trigger was updated
+        console.log('No profile data found, user may need to complete their profile');
+        setUserData(prev => ({ 
+          ...prev, 
+          email: user.email || '',
+          name: user.user_metadata?.name || '',
+          age: user.user_metadata?.age || '',
+          height: user.user_metadata?.height || '',
+          weight: user.user_metadata?.weight || '',
+          sex: user.user_metadata?.sex || '',
+          medicalInfo: user.user_metadata?.medicalInfo || ''
+        }));
         toast({
-          title: 'No profile found',
-          description: 'Please complete your profile and save.'
+          title: 'Profile Setup',
+          description: 'Please complete and save your profile information.',
+          variant: 'default'
         });
-        setUserData((prev) => ({ ...prev, email: user.email || '' }));
       }
     } catch (error) {
       console.error('Error loading profile:', error);
