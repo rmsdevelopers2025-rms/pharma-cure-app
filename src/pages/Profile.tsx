@@ -188,8 +188,11 @@ const Profile = () => {
                     <User className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-2xl">{userData.name}</CardTitle>
-                    <p className="text-gray-600">{userData.age} years old</p>
+                    <CardTitle className="text-2xl">{userData.name || 'User'}</CardTitle>
+                    <p className="text-gray-600">
+                      {userData.age ? `${userData.age} years old` : 'Age not specified'}
+                      {userData.sex && ` • ${userData.sex.charAt(0).toUpperCase() + userData.sex.slice(1)}`}
+                    </p>
                   </div>
                 </div>
                 <Button
