@@ -70,6 +70,38 @@ const SignIn = () => {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!email) {
+      toast({ title: 'Email required', description: 'Please enter your email first.', variant: 'destructive' });
+      return;
+    }
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email.trim(),
+      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+    });
+    if (error) {
+      toast({ title: 'Resend failed', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Verification sent', description: 'Check your inbox for a new confirmation link.' });
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      toast({ title: 'Email required', description: 'Please enter your email first.', variant: 'destructive' });
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/signin`,
+    });
+    if (error) {
+      toast({ title: 'Reset failed', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Password reset email sent', description: 'Follow the link in your email to set a new password.' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -126,6 +158,22 @@ const SignIn = () => {
               <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors duration-300 shadow-lg">
                 {t('signIn')}
               </Button>
+              <div className="mt-4 flex items-center justify-between text-sm">
+                <button
+                  type="button"
+                  onClick={handleResetPassword}
+                  className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                >
+                  Forgot password?
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  Resend verification email
+                </button>
+              </div>
             </form>
 
             <div className="text-center mt-8">
