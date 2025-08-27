@@ -24,12 +24,50 @@ const SignIn = () => {
   }, [navigate]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      toast({ title: 'Sign in failed', description: error.message });
+    
+    if (!email || !password) {
+      toast({ 
+        title: 'Sign in failed', 
+        description: 'Please enter both email and password',
+        variant: 'destructive'
+      });
       return;
     }
-    navigate('/dashboard');
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ 
+        email: email.trim(), 
+        password 
+      });
+      
+      if (error) {
+        console.error('Sign in error:', error);
+        let errorMessage = error.message;
+        
+        // Provide more user-friendly error messages
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = 'Please check your email and click the confirmation link before signing in.';
+        }
+        
+        toast({ 
+          title: 'Sign in failed', 
+          description: errorMessage,
+          variant: 'destructive'
+        });
+        return;
+      }
+      
+      // Success - navigation will happen automatically via AuthContext
+    } catch (err) {
+      console.error('Unexpected error during sign in:', err);
+      toast({ 
+        title: 'Sign in failed', 
+        description: 'An unexpected error occurred. Please try again.',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (
