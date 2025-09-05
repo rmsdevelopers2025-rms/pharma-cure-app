@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
-import { drugDatabase, searchDrugs, getAutoCorrectSuggestion, Drug } from '@/data/drugDatabase';
+import { Drug } from '@/data/drugDatabase';
+import { searchDrugs, getAutoCorrectSuggestion, getDrugSuggestions } from '@/services/drugService';
 import SearchBar from '@/components/search/SearchBar';
 import SearchResults from '@/components/search/SearchResults';
 
@@ -13,51 +14,44 @@ const Search = () => {
   const [showAutoCorrect, setShowAutoCorrect] = useState(false);
 
   useEffect(() => {
-    if (searchQuery.length > 0) {
-      // Get suggestions with improved matching
-      const filteredSuggestions = drugDatabase
-        .filter(drug => {
-          const queryLower = searchQuery.toLowerCase();
-          return drug.name.toLowerCase().includes(queryLower) ||
-                 drug.brands.some(brand => brand.toLowerCase().includes(queryLower)) ||
-                 drug.genericName?.toLowerCase().includes(queryLower) ||
-                 drug.composition.some(comp => 
-                   comp.activeIngredient.toLowerCase().includes(queryLower)
-                 );
-        })
-        .slice(0, 8) // Increased to show more suggestions
-        .map(drug => drug.name);
-      
-      setSuggestions(filteredSuggestions);
-      setShowSuggestions(true);
+    const fetchSuggestions = async () => {
+      if (searchQuery.length > 0) {
+        // Get suggestions from Supabase
+        const filteredSuggestions = await getDrugSuggestions(searchQuery);
+        
+        setSuggestions(filteredSuggestions);
+        setShowSuggestions(true);
 
-      // Check for auto-correct
-      if (filteredSuggestions.length === 0) {
-        const correction = getAutoCorrectSuggestion(searchQuery);
-        if (correction && correction.toLowerCase() !== searchQuery.toLowerCase()) {
-          setAutoCorrectSuggestion(correction);
-          setShowAutoCorrect(true);
+        // Check for auto-correct
+        if (filteredSuggestions.length === 0) {
+          const correction = await getAutoCorrectSuggestion(searchQuery);
+          if (correction && correction.toLowerCase() !== searchQuery.toLowerCase()) {
+            setAutoCorrectSuggestion(correction);
+            setShowAutoCorrect(true);
+          } else {
+            setAutoCorrectSuggestion(null);
+            setShowAutoCorrect(false);
+          }
         } else {
           setAutoCorrectSuggestion(null);
           setShowAutoCorrect(false);
         }
       } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
         setAutoCorrectSuggestion(null);
         setShowAutoCorrect(false);
       }
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setAutoCorrectSuggestion(null);
-      setShowAutoCorrect(false);
-    }
+    };
+
+    fetchSuggestions();
   }, [searchQuery]);
 
-  const handleSearch = (query?: string) => {
+  const handleSearch = async (query?: string) => {
     const searchTerm = query || searchQuery;
     if (!searchTerm) return;
 
-    const results = searchDrugs(searchTerm);
+    const results = await searchDrugs(searchTerm);
     setSearchResults(results);
     setShowSuggestions(false);
     setShowAutoCorrect(false);
@@ -69,11 +63,11 @@ const Search = () => {
     handleSearch(suggestion);
   };
 
-  const handleAutoCorrectClick = () => {
+  const handleAutoCorrectClick = async () => {
     if (autoCorrectSuggestion) {
       setSearchQuery(autoCorrectSuggestion);
       setShowAutoCorrect(false);
-      handleSearch(autoCorrectSuggestion);
+      await handleSearch(autoCorrectSuggestion);
     }
   };
 
