@@ -4,11 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Crown, Check, AlertTriangle, Shield, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { createSubscription } from '@/services/subscriptionService';
 import Header from '@/components/Header';
 
 const Premium = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const plans = [
     {
@@ -61,10 +67,65 @@ const Premium = () => {
     }
   ];
 
-  const handleSubscribe = (planName: string) => {
+  const handleSubscribe = async (planName: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to subscribe to a plan",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setSelectedPlan(planName);
-    // Simulate subscription process
-    alert(`Subscribing to ${planName} plan...`);
+    setIsSubscribing(true);
+    
+    try {
+      // Calculate expiry date for yearly plans
+      let expiresAt: string | undefined;
+      if (planName === 'Yearly') {
+        const now = new Date();
+        now.setFullYear(now.getFullYear() + 1);
+        expiresAt = now.toISOString();
+      } else if (planName === 'Monthly') {
+        const now = new Date();
+        now.setMonth(now.getMonth() + 1);
+        expiresAt = now.toISOString();
+      }
+
+      // Save subscription to database
+      const { data, error } = await createSubscription(
+        user.id,
+        planName,
+        planName.toLowerCase(),
+        expiresAt
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Subscription successful!",
+        description: `You have successfully subscribed to the ${planName} plan.`
+      });
+
+      // In a real app, this would redirect to payment processor
+      setTimeout(() => {
+        setSelectedPlan(null);
+        setIsSubscribing(false);
+      }, 2000);
+
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast({
+        title: "Subscription failed",
+        description: "Failed to process subscription. Please try again.",
+        variant: "destructive"
+      });
+      setSelectedPlan(null);
+      setIsSubscribing(false);
+    }
   };
 
   return (
@@ -135,13 +196,14 @@ const Premium = () => {
                   
                   <Button
                     onClick={() => handleSubscribe(plan.name)}
+                    disabled={isSubscribing}
                     className={`w-full ${
                       plan.popular 
                         ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white hover:from-yellow-500 hover:to-yellow-700' 
                         : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                     }`}
                   >
-                    {selectedPlan === plan.name ? 'Processing...' : `Subscribe to ${plan.name}`}
+                    {selectedPlan === plan.name && isSubscribing ? 'Processing...' : `Subscribe to ${plan.name}`}
                   </Button>
                 </CardContent>
               </Card>

@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { savePrescription, updatePrescriptionAnalysis } from '@/services/prescriptionService';
 import Header from '@/components/Header';
 
 const Prescription = () => {
@@ -15,6 +16,7 @@ const Prescription = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [currentPrescriptionId, setCurrentPrescriptionId] = useState<string | null>(null);
   const { t } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -95,6 +97,24 @@ const Prescription = () => {
         throw uploadError;
       }
 
+      // Get public URL for the uploaded file
+      const { data: { publicUrl } } = supabase.storage
+        .from('prescriptions')
+        .getPublicUrl(fileName);
+
+      // Save prescription record to database
+      const { data: prescriptionData, error: saveError } = await savePrescription(
+        user.id,
+        publicUrl,
+        file.name
+      );
+
+      if (saveError) {
+        console.error('Save prescription error:', saveError);
+      } else {
+        setCurrentPrescriptionId(prescriptionData.id);
+      }
+
       toast({
         title: "Upload successful",
         description: "Prescription image uploaded successfully"
@@ -118,9 +138,8 @@ const Prescription = () => {
     setIsAnalyzing(true);
     
     // Simulate AI analysis
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setAnalysisResult({
+    setTimeout(async () => {
+      const analysisResults = {
         medications: [
           {
             name: 'Amoxicillin',
@@ -141,7 +160,18 @@ const Prescription = () => {
             isPremium: true
           }
         ]
-      });
+      };
+      
+      setIsAnalyzing(false);
+      setAnalysisResult(analysisResults);
+      
+      // Update prescription record with analysis results
+      if (currentPrescriptionId) {
+        const { error } = await updatePrescriptionAnalysis(currentPrescriptionId, analysisResults);
+        if (error) {
+          console.error('Update analysis error:', error);
+        }
+      }
     }, 3000);
   };
 
@@ -149,6 +179,7 @@ const Prescription = () => {
     setUploadedFile(null);
     setImagePreview(null);
     setAnalysisResult(null);
+    setCurrentPrescriptionId(null);
   };
 
   return (
