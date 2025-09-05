@@ -14,6 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      drugs: {
+        Row: {
+          available_strengths: string[]
+          brands: string[]
+          category: string | null
+          composition: Json
+          contraindications: string[]
+          created_at: string
+          disorders: string[]
+          dosage: Json
+          dosage_forms: string[]
+          drug_interactions: string[]
+          generic_name: string | null
+          id: string
+          incompatibility: string[]
+          indications: string[]
+          is_premium: boolean
+          lactation: string | null
+          mechanism: string | null
+          monitoring: string[]
+          name: string
+          overdose: string | null
+          pharmacokinetics: Json
+          pharmacological_class: string | null
+          pregnancy_category: string | null
+          side_effects: string[]
+          storage: string | null
+          therapeutic_class: string | null
+          updated_at: string
+          warnings: string[]
+        }
+        Insert: {
+          available_strengths?: string[]
+          brands?: string[]
+          category?: string | null
+          composition?: Json
+          contraindications?: string[]
+          created_at?: string
+          disorders?: string[]
+          dosage?: Json
+          dosage_forms?: string[]
+          drug_interactions?: string[]
+          generic_name?: string | null
+          id?: string
+          incompatibility?: string[]
+          indications?: string[]
+          is_premium?: boolean
+          lactation?: string | null
+          mechanism?: string | null
+          monitoring?: string[]
+          name: string
+          overdose?: string | null
+          pharmacokinetics?: Json
+          pharmacological_class?: string | null
+          pregnancy_category?: string | null
+          side_effects?: string[]
+          storage?: string | null
+          therapeutic_class?: string | null
+          updated_at?: string
+          warnings?: string[]
+        }
+        Update: {
+          available_strengths?: string[]
+          brands?: string[]
+          category?: string | null
+          composition?: Json
+          contraindications?: string[]
+          created_at?: string
+          disorders?: string[]
+          dosage?: Json
+          dosage_forms?: string[]
+          drug_interactions?: string[]
+          generic_name?: string | null
+          id?: string
+          incompatibility?: string[]
+          indications?: string[]
+          is_premium?: boolean
+          lactation?: string | null
+          mechanism?: string | null
+          monitoring?: string[]
+          name?: string
+          overdose?: string | null
+          pharmacokinetics?: Json
+          pharmacological_class?: string | null
+          pregnancy_category?: string | null
+          side_effects?: string[]
+          storage?: string | null
+          therapeutic_class?: string | null
+          updated_at?: string
+          warnings?: string[]
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
@@ -58,7 +151,75 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_auto_correct_suggestion: {
+        Args: { q: string }
+        Returns: string
+      }
+      gtrgm_compress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_decompress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_options: {
+        Args: { "": unknown }
+        Returns: undefined
+      }
+      gtrgm_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      search_drugs: {
+        Args: { q: string }
+        Returns: {
+          available_strengths: string[]
+          brands: string[]
+          category: string | null
+          composition: Json
+          contraindications: string[]
+          created_at: string
+          disorders: string[]
+          dosage: Json
+          dosage_forms: string[]
+          drug_interactions: string[]
+          generic_name: string | null
+          id: string
+          incompatibility: string[]
+          indications: string[]
+          is_premium: boolean
+          lactation: string | null
+          mechanism: string | null
+          monitoring: string[]
+          name: string
+          overdose: string | null
+          pharmacokinetics: Json
+          pharmacological_class: string | null
+          pregnancy_category: string | null
+          side_effects: string[]
+          storage: string | null
+          therapeutic_class: string | null
+          updated_at: string
+          warnings: string[]
+        }[]
+      }
+      set_limit: {
+        Args: { "": number }
+        Returns: number
+      }
+      show_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      show_trgm: {
+        Args: { "": string }
+        Returns: string[]
+      }
     }
     Enums: {
       [_ in never]: never
