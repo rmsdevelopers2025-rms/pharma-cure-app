@@ -6,6 +6,7 @@ import { saveSearchHistory } from '@/services/searchHistoryService';
 import { useAuth } from '@/contexts/AuthContext';
 import SearchBar from '@/components/search/SearchBar';
 import SearchResults from '@/components/search/SearchResults';
+import DrugReminder from '@/components/DrugReminder';
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -116,6 +117,11 @@ const Search = () => {
             onAutoCorrectClick={handleAutoCorrectClick}
             onSpeak={speakText}
           />
+
+          {/* Drug Reminder Section */}
+          <div className="mt-8">
+            <DrugReminder />
+          </div>
         </div>
       </div>
     </div>

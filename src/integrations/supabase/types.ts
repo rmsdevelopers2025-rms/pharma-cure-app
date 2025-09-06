@@ -16,49 +16,94 @@ export type Database = {
     Tables: {
       drugs: {
         Row: {
+          available_strengths: string[] | null
           brands: string[]
           category: string | null
+          composition: Json | null
+          contraindications: string[] | null
           created_at: string
           disorders: string[]
+          dosage: Json | null
           dosage_forms: string[]
+          drug_interactions: string[] | null
           generic_name: string | null
           id: string
           incompatibility: string[]
+          indications: string[] | null
           is_premium: boolean
+          lactation: string | null
+          mechanism: string | null
+          monitoring: string[] | null
           name: string
+          overdose: string | null
+          pharmacokinetics: Json | null
+          pharmacological_class: string | null
+          pregnancy_category: string | null
           side_effects: string[]
           storage: string | null
+          therapeutic_class: string | null
           updated_at: string
+          warnings: string[] | null
         }
         Insert: {
+          available_strengths?: string[] | null
           brands?: string[]
           category?: string | null
+          composition?: Json | null
+          contraindications?: string[] | null
           created_at?: string
           disorders?: string[]
+          dosage?: Json | null
           dosage_forms?: string[]
+          drug_interactions?: string[] | null
           generic_name?: string | null
           id?: string
           incompatibility?: string[]
+          indications?: string[] | null
           is_premium?: boolean
+          lactation?: string | null
+          mechanism?: string | null
+          monitoring?: string[] | null
           name: string
+          overdose?: string | null
+          pharmacokinetics?: Json | null
+          pharmacological_class?: string | null
+          pregnancy_category?: string | null
           side_effects?: string[]
           storage?: string | null
+          therapeutic_class?: string | null
           updated_at?: string
+          warnings?: string[] | null
         }
         Update: {
+          available_strengths?: string[] | null
           brands?: string[]
           category?: string | null
+          composition?: Json | null
+          contraindications?: string[] | null
           created_at?: string
           disorders?: string[]
+          dosage?: Json | null
           dosage_forms?: string[]
+          drug_interactions?: string[] | null
           generic_name?: string | null
           id?: string
           incompatibility?: string[]
+          indications?: string[] | null
           is_premium?: boolean
+          lactation?: string | null
+          mechanism?: string | null
+          monitoring?: string[] | null
           name?: string
+          overdose?: string | null
+          pharmacokinetics?: Json | null
+          pharmacological_class?: string | null
+          pregnancy_category?: string | null
           side_effects?: string[]
           storage?: string | null
+          therapeutic_class?: string | null
           updated_at?: string
+          warnings?: string[] | null
         }
         Relationships: []
       }
@@ -480,19 +525,34 @@ export type Database = {
       search_drugs: {
         Args: { q: string }
         Returns: {
+          available_strengths: string[] | null
           brands: string[]
           category: string | null
+          composition: Json | null
+          contraindications: string[] | null
           created_at: string
           disorders: string[]
+          dosage: Json | null
           dosage_forms: string[]
+          drug_interactions: string[] | null
           generic_name: string | null
           id: string
           incompatibility: string[]
+          indications: string[] | null
           is_premium: boolean
+          lactation: string | null
+          mechanism: string | null
+          monitoring: string[] | null
           name: string
+          overdose: string | null
+          pharmacokinetics: Json | null
+          pharmacological_class: string | null
+          pregnancy_category: string | null
           side_effects: string[]
           storage: string | null
+          therapeutic_class: string | null
           updated_at: string
+          warnings: string[] | null
         }[]
       }
       set_limit: {

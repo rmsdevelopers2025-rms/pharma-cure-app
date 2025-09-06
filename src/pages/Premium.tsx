@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { createSubscription } from '@/services/subscriptionService';
 import Header from '@/components/Header';
+import { supabase } from '@/integrations/supabase/client';
 
 const Premium = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
@@ -18,9 +19,10 @@ const Premium = () => {
 
   const plans = [
     {
-      name: 'Monthly',
-      price: '$9.99',
+      name: 'Basic',
+      price: '₹299',
       period: '/month',
+      type: 'basic',
       features: [
         'Drug Incompatibility Check',
         'Disorder Information',
@@ -30,18 +32,33 @@ const Premium = () => {
       ]
     },
     {
-      name: 'Yearly',
-      price: '$99.99',
-      period: '/year',
+      name: 'Premium',
+      price: '₹599',
+      period: '/month',
+      type: 'premium',
       popular: true,
-      save: 'Save 17%',
+      save: 'Most Popular',
       features: [
-        'All Monthly Features',
+        'All Basic Features',
         'Unlimited Searches',
         'AI Drug Recommendations',
         'Health Tracking',
         'Family Profiles',
         'Offline Access'
+      ]
+    },
+    {
+      name: 'Enterprise',
+      price: '₹1199',
+      period: '/month',
+      type: 'enterprise',
+      features: [
+        'All Premium Features',
+        'Advanced Analytics',
+        'Custom Integrations',
+        'Dedicated Support',
+        'Multi-clinic Access',
+        'White-label Solution'
       ]
     }
   ];
@@ -67,64 +84,32 @@ const Premium = () => {
     }
   ];
 
-  const handleSubscribe = async (planName: string) => {
+  const handleSubscribe = async (planType: string) => {
     if (!user) {
       toast({
-        title: "Authentication required",
-        description: "Please sign in to subscribe to a plan",
-        variant: "destructive"
+        title: "Authentication Required",
+        description: "Please sign in to subscribe to a plan.",
+        variant: "destructive",
       });
       return;
     }
 
-    setSelectedPlan(planName);
-    setIsSubscribing(true);
-    
     try {
-      // Calculate expiry date for yearly plans
-      let expiresAt: string | undefined;
-      if (planName === 'Yearly') {
-        const now = new Date();
-        now.setFullYear(now.getFullYear() + 1);
-        expiresAt = now.toISOString();
-      } else if (planName === 'Monthly') {
-        const now = new Date();
-        now.setMonth(now.getMonth() + 1);
-        expiresAt = now.toISOString();
-      }
-
-      // Save subscription to database
-      const { data, error } = await createSubscription(
-        user.id,
-        planName,
-        planName.toLowerCase(),
-        expiresAt
-      );
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: "Subscription successful!",
-        description: `You have successfully subscribed to the ${planName} plan.`
+      const { data, error } = await supabase.functions.invoke('create-checkout-inr', {
+        body: { planType }
       });
 
-      // In a real app, this would redirect to payment processor
-      setTimeout(() => {
-        setSelectedPlan(null);
-        setIsSubscribing(false);
-      }, 2000);
+      if (error) throw error;
 
+      // Open Stripe checkout in a new tab
+      window.open(data.url, '_blank');
     } catch (error) {
       console.error('Subscription error:', error);
       toast({
-        title: "Subscription failed",
-        description: "Failed to process subscription. Please try again.",
-        variant: "destructive"
+        title: "Subscription Error",
+        description: "Failed to start subscription process. Please try again.",
+        variant: "destructive",
       });
-      setSelectedPlan(null);
-      setIsSubscribing(false);
     }
   };
 
@@ -159,16 +144,16 @@ const Premium = () => {
           </div>
 
           {/* Pricing Plans */}
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {plans.map((plan, index) => (
               <Card 
                 key={index} 
-                className={`relative ${plan.popular ? 'border-2 border-yellow-400 shadow-lg' : ''}`}
+                className={`relative ${plan.popular ? 'border-2 border-blue-500 shadow-lg' : ''}`}
               >
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                      Most Popular
+                    <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                      {plan.save}
                     </span>
                   </div>
                 )}
@@ -179,9 +164,6 @@ const Premium = () => {
                     {plan.price}
                     <span className="text-lg font-normal text-gray-600">{plan.period}</span>
                   </div>
-                  {plan.save && (
-                    <div className="text-green-600 font-semibold">{plan.save}</div>
-                  )}
                 </CardHeader>
                 
                 <CardContent className="p-6">
@@ -195,15 +177,16 @@ const Premium = () => {
                   </ul>
                   
                   <Button
-                    onClick={() => handleSubscribe(plan.name)}
-                    disabled={isSubscribing}
+                    onClick={() => handleSubscribe(plan.type)}
                     className={`w-full ${
                       plan.popular 
-                        ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white hover:from-yellow-500 hover:to-yellow-700' 
-                        : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700' 
+                        : index === 0 
+                        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white'
+                        : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
                     }`}
                   >
-                    {selectedPlan === plan.name && isSubscribing ? 'Processing...' : `Subscribe to ${plan.name}`}
+                    Subscribe to {plan.name}
                   </Button>
                 </CardContent>
               </Card>
