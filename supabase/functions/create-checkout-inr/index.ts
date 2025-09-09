@@ -12,17 +12,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
 
+  try {
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated");
+    if (!user?.email) throw new Error("User not authenticated or email not available");
 
     const { planType } = await req.json();
 
@@ -30,19 +30,21 @@ serve(async (req) => {
       apiVersion: "2023-10-16",
     });
 
-    // Check for existing customer
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
     }
 
-    // Plan pricing in INR
-    const planPrices = {
-      basic: 29900, // ₹299
-      premium: 59900, // ₹599
-      enterprise: 119900 // ₹1199
+    // Indian pricing in INR
+    const pricing = {
+      basic: { amount: 49900, name: "Basic Plan" }, // ₹499
+      premium: { amount: 99900, name: "Premium Plan" }, // ₹999
+      enterprise: { amount: 199900, name: "Enterprise Plan" } // ₹1999
     };
+
+    const selectedPlan = pricing[planType as keyof typeof pricing];
+    if (!selectedPlan) throw new Error("Invalid plan type");
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -52,18 +54,20 @@ serve(async (req) => {
           price_data: {
             currency: "inr",
             product_data: { 
-              name: `${planType.charAt(0).toUpperCase() + planType.slice(1)} Subscription`,
-              description: `Monthly subscription for ${planType} plan`
+              name: selectedPlan.name,
+              description: `Monthly subscription to ${selectedPlan.name}`
             },
-            unit_amount: planPrices[planType as keyof typeof planPrices],
+            unit_amount: selectedPlan.amount,
             recurring: { interval: "month" },
           },
           quantity: 1,
         },
       ],
       mode: "subscription",
+      payment_method_types: ["card", "upi"],
       success_url: `${req.headers.get("origin")}/premium?success=true`,
       cancel_url: `${req.headers.get("origin")}/premium?canceled=true`,
+      locale: "en",
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
