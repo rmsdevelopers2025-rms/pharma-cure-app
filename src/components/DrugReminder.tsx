@@ -47,6 +47,54 @@ const DrugReminder = () => {
     localStorage.setItem('drugReminders', JSON.stringify(updatedReminders));
   };
 
+  const playAlarmSound = (alarmType: string) => {
+    // Create audio context for playing alarm sounds
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    
+    const playSound = (frequency: number, duration: number, type: 'sine' | 'square' | 'sawtooth' | 'triangle' = 'sine') => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.type = type;
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    };
+
+    switch (alarmType) {
+      case 'bell':
+        playSound(800, 0.5);
+        setTimeout(() => playSound(800, 0.5), 600);
+        break;
+      case 'chime':
+        playSound(523, 0.3);
+        setTimeout(() => playSound(659, 0.3), 300);
+        setTimeout(() => playSound(784, 0.3), 600);
+        break;
+      case 'beep':
+        playSound(1000, 0.2, 'square');
+        break;
+      case 'tone':
+        playSound(440, 1);
+        break;
+      case 'vibrate':
+        if ('vibrate' in navigator) {
+          navigator.vibrate([200, 100, 200]);
+        }
+        break;
+      default:
+        playSound(523, 0.5);
+        setTimeout(() => playSound(659, 0.5), 600);
+    }
+  };
+
   const addReminder = () => {
     if (!newReminder.drugName || !newReminder.dosage) return;
 
@@ -81,6 +129,47 @@ const DrugReminder = () => {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
+
+    // Set up reminder notifications
+    scheduleReminder(reminder);
+  };
+
+  const scheduleReminder = (reminder: Reminder) => {
+    reminder.time.forEach(time => {
+      const [hours, minutes] = time.split(':').map(Number);
+      const scheduleNotification = () => {
+        const now = new Date();
+        const reminderTime = new Date();
+        reminderTime.setHours(hours, minutes, 0, 0);
+        
+        if (reminderTime < now) {
+          reminderTime.setDate(reminderTime.getDate() + 1);
+        }
+        
+        const timeUntilReminder = reminderTime.getTime() - now.getTime();
+        
+        setTimeout(() => {
+          // Show notification
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(`Time for ${reminder.drugName}`, {
+              body: `Take ${reminder.dosage} - ${reminder.notes || 'No additional notes'}`,
+              icon: '/favicon.ico',
+              tag: reminder.id
+            });
+          }
+          
+          // Play alarm sound
+          playAlarmSound(reminder.alarmSound);
+          
+          // Schedule next day if it's a recurring reminder
+          if (reminder.frequency === 'daily') {
+            scheduleNotification();
+          }
+        }, timeUntilReminder);
+      };
+      
+      scheduleNotification();
+    });
   };
 
   const deleteReminder = (id: string) => {
@@ -202,18 +291,29 @@ const DrugReminder = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Alarm Sound</label>
-                <select
-                  value={newReminder.alarmSound || 'default'}
-                  onChange={(e) => setNewReminder(prev => ({ ...prev, alarmSound: e.target.value }))}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="default">Default Alarm</option>
-                  <option value="bell">Bell</option>
-                  <option value="chime">Chime</option>
-                  <option value="beep">Beep</option>
-                  <option value="tone">Tone</option>
-                  <option value="vibrate">Vibrate Only</option>
-                </select>
+                <div className="flex items-center space-x-2">
+                  <select
+                    value={newReminder.alarmSound || 'default'}
+                    onChange={(e) => setNewReminder(prev => ({ ...prev, alarmSound: e.target.value }))}
+                    className="flex-1 p-2 border rounded-md"
+                  >
+                    <option value="default">Default Alarm</option>
+                    <option value="bell">Bell</option>
+                    <option value="chime">Chime</option>
+                    <option value="beep">Beep</option>
+                    <option value="tone">Tone</option>
+                    <option value="vibrate">Vibrate Only</option>
+                  </select>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => playAlarmSound(newReminder.alarmSound || 'default')}
+                    className="px-3"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Notes (Optional)</label>

@@ -107,6 +107,48 @@ export type Database = {
         }
         Relationships: []
       }
+      nearby_pharmacies: {
+        Row: {
+          address: string
+          created_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          operating_hours: Json | null
+          phone_number: string | null
+          rating: number | null
+          services: Json | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          operating_hours?: Json | null
+          phone_number?: string | null
+          rating?: number | null
+          services?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          operating_hours?: Json | null
+          phone_number?: string | null
+          rating?: number | null
+          services?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       prescriptions: {
         Row: {
           analysis_results: Json | null
