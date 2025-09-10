@@ -94,12 +94,32 @@ const Premium = () => {
       return;
     }
 
+    setIsSubscribing(true);
+    setSelectedPlan(planType);
+
     try {
+      console.log('Starting subscription for plan:', planType);
+      console.log('User authenticated:', !!user, user?.email);
+
       const { data, error } = await supabase.functions.invoke('create-checkout-inr', {
         body: { planType }
       });
 
-      if (error) throw error;
+      console.log('Stripe response:', { data, error });
+
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
+      }
+
+      if (!data?.url) {
+        throw new Error('No checkout URL received');
+      }
+
+      toast({
+        title: "Redirecting to Payment",
+        description: "Opening Stripe checkout...",
+      });
 
       // Open Stripe checkout in a new tab
       window.open(data.url, '_blank');
@@ -107,9 +127,12 @@ const Premium = () => {
       console.error('Subscription error:', error);
       toast({
         title: "Subscription Error",
-        description: "Failed to start subscription process. Please try again.",
+        description: error.message || "Failed to start subscription process. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubscribing(false);
+      setSelectedPlan(null);
     }
   };
 
@@ -178,6 +201,7 @@ const Premium = () => {
                   
                   <Button
                     onClick={() => handleSubscribe(plan.type)}
+                    disabled={isSubscribing}
                     className={`w-full ${
                       plan.popular 
                         ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700' 
@@ -186,7 +210,7 @@ const Premium = () => {
                         : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
                     }`}
                   >
-                    Subscribe to {plan.name}
+                    {isSubscribing && selectedPlan === plan.type ? 'Processing...' : `Subscribe to ${plan.name}`}
                   </Button>
                 </CardContent>
               </Card>
