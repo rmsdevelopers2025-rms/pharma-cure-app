@@ -209,23 +209,23 @@ const Prescription = () => {
               {!uploadedFile ? (
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* File Upload */}
-                  <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors bg-blue-50/50">
-                    <Upload className="w-16 h-16 mx-auto mb-4 text-blue-500" />
-                    <h3 className="font-bold mb-2 text-lg text-gray-800">Upload from Gallery</h3>
-                    <p className="text-sm text-gray-600 mb-6">Choose image from your device</p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      id="file-upload"
-                    />
-                    <label htmlFor="file-upload">
-                      <Button variant="outline" className="cursor-pointer border-blue-500 text-blue-600 hover:bg-blue-50">
+                  <label htmlFor="file-upload" className="block cursor-pointer">
+                    <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors bg-blue-50/50">
+                      <Upload className="w-16 h-16 mx-auto mb-4 text-blue-500" />
+                      <h3 className="font-bold mb-2 text-lg text-gray-800">Upload from Gallery</h3>
+                      <p className="text-sm text-gray-600 mb-6">Choose image from your device</p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="file-upload"
+                      />
+                      <Button variant="outline" className="pointer-events-none border-blue-500 text-blue-600 hover:bg-blue-50">
                         Select File
                       </Button>
-                    </label>
-                  </div>
+                    </div>
+                  </label>
 
                   {/* Camera Capture */}
                   <div className="border-2 border-dashed border-green-300 rounded-xl p-8 text-center hover:border-green-400 transition-colors bg-green-50/50">
