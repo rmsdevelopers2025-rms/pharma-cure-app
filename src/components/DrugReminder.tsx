@@ -38,7 +38,13 @@ const DrugReminder = () => {
     // Load reminders from localStorage
     const savedReminders = localStorage.getItem('drugReminders');
     if (savedReminders) {
-      setReminders(JSON.parse(savedReminders));
+      const reminders = JSON.parse(savedReminders);
+      setReminders(reminders);
+      
+      // Schedule notifications for existing reminders
+      reminders.forEach((reminder: Reminder) => {
+        scheduleReminder(reminder);
+      });
     }
   }, []);
 
