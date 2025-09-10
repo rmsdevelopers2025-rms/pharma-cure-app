@@ -20,7 +20,7 @@ const Premium = () => {
   const plans = [
     {
       name: 'Basic',
-      price: '₹299',
+      price: '₹499',
       period: '/month',
       type: 'basic',
       features: [
@@ -33,7 +33,7 @@ const Premium = () => {
     },
     {
       name: 'Premium',
-      price: '₹599',
+      price: '₹999',
       period: '/month',
       type: 'premium',
       popular: true,
@@ -49,7 +49,7 @@ const Premium = () => {
     },
     {
       name: 'Enterprise',
-      price: '₹1199',
+      price: '₹1999',
       period: '/month',
       type: 'enterprise',
       features: [
