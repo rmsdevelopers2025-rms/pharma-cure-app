@@ -96,9 +96,30 @@ const SignUp = () => {
 
       if (error) {
         console.error('Sign up error:', error);
+        
+        // Handle specific error cases
+        let errorMessage = error.message;
+        let errorTitle = 'Sign up failed';
+        
+        if (error.message.includes('User already registered') || 
+            error.message.includes('duplicate key') ||
+            error.message.includes('already exists')) {
+          errorTitle = 'Account already exists';
+          errorMessage = 'An account with this email already exists. Please sign in instead.';
+        } else if (error.message.includes('Database error saving new user')) {
+          errorTitle = 'Account already exists';
+          errorMessage = 'This email is already registered. Please sign in or use a different email.';
+        } else if (error.message.includes('Invalid email')) {
+          errorTitle = 'Invalid email';
+          errorMessage = 'Please enter a valid email address.';
+        } else if (error.message.includes('Password')) {
+          errorTitle = 'Password error';
+          errorMessage = 'Password must be at least 6 characters long.';
+        }
+        
         toast({
-          title: 'Sign up failed',
-          description: error.message,
+          title: errorTitle,
+          description: errorMessage,
           variant: 'destructive'
         });
         return;
