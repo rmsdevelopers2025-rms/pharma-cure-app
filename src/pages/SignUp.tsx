@@ -69,44 +69,66 @@ const SignUp = () => {
       });
       return;
     }
-    const redirectUrl = `${window.location.origin}/dashboard`;
-    const {
-      data,
-      error
-    } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          name: formData.name,
-          age: formData.age ? Number(formData.age) : null,
-          height: formData.height ? Number(formData.height) : null,
-          weight: formData.weight ? Number(formData.weight) : null,
-          sex: formData.sex || null,
-          email: formData.email,
-          medicalInfo: formData.medicalInfo || null
+
+    try {
+      console.log('Attempting sign up with email:', formData.email);
+      const redirectUrl = `${window.location.origin}/dashboard`;
+      console.log('Redirect URL:', redirectUrl);
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            name: formData.name,
+            age: formData.age ? Number(formData.age) : null,
+            height: formData.height ? Number(formData.height) : null,
+            weight: formData.weight ? Number(formData.weight) : null,
+            sex: formData.sex || null,
+            email: formData.email,
+            medicalInfo: formData.medicalInfo || null
+          }
         }
+      });
+
+      console.log('Sign up response:', { data, error });
+
+      if (error) {
+        console.error('Sign up error:', error);
+        toast({
+          title: 'Sign up failed',
+          description: error.message,
+          variant: 'destructive'
+        });
+        return;
       }
-    });
-    if (error) {
+
+      // Keep demo welcome name
+      localStorage.setItem('userName', formData.name);
+      
+      if (data.user && !data.session) {
+        console.log('Email confirmation required');
+        toast({
+          title: 'Confirm your email',
+          description: 'Check your inbox to complete sign up.'
+        });
+        navigate('/signin');
+      } else {
+        console.log('Sign up successful with immediate session');
+        toast({
+          title: 'Sign up successful',
+          description: 'Welcome to PharmaCure!'
+        });
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      console.error('Unexpected error during sign up:', err);
       toast({
         title: 'Sign up failed',
-        description: error.message
+        description: 'An unexpected error occurred. Please try again.',
+        variant: 'destructive'
       });
-      return;
-    }
-
-    // Keep demo welcome name
-    localStorage.setItem('userName', formData.name);
-    if (data.user && !data.session) {
-      toast({
-        title: 'Confirm your email',
-        description: 'Check your inbox to complete sign up.'
-      });
-      navigate('/signin');
-    } else {
-      navigate('/dashboard');
     }
   };
   const handleInputChange = (field: string, value: string) => {

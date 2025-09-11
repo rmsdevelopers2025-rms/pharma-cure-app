@@ -35,10 +35,13 @@ const SignIn = () => {
     }
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({ 
+      console.log('Attempting sign in with email:', email.trim());
+      const { data, error } = await supabase.auth.signInWithPassword({ 
         email: email.trim(), 
         password 
       });
+      
+      console.log('Sign in response:', { data, error });
       
       if (error) {
         console.error('Sign in error:', error);
@@ -58,6 +61,13 @@ const SignIn = () => {
         });
         return;
       }
+      
+      console.log('Sign in successful, session:', data.session);
+      toast({ 
+        title: 'Sign in successful', 
+        description: 'Welcome back!',
+        variant: 'default'
+      });
       
       // Success - navigation will happen automatically via AuthContext
     } catch (err) {
