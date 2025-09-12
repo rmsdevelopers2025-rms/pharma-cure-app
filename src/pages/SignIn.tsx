@@ -22,6 +22,26 @@ const SignIn = () => {
       if (session) navigate('/dashboard');
     });
   }, [navigate]);
+
+  // Network and CORS diagnostics helper for Supabase auth
+  const runAuthDiagnostics = async () => {
+    try {
+      console.log('[Diagnostics] Location:', window.location.origin, 'Protocol:', window.location.protocol);
+      const healthUrl = 'https://oxcxqjubctslypthviux.supabase.co/auth/v1/health';
+      console.log('[Diagnostics] Pinging Supabase Auth health:', healthUrl);
+      const res = await fetch(healthUrl, {
+        headers: {
+          apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94Y3hxanViY3RzbHlwdGh2aXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNDI3NDgsImV4cCI6MjA3MjYxODc0OH0.qiY3MAy0TxD610ORcJ-r6cC8xewUB830dMqMjMIBqDM'
+        }
+      });
+      console.log('[Diagnostics] Health response:', res.status, res.statusText);
+      if (!res.ok) {
+        console.warn('[Diagnostics] Health endpoint not OK. Possible CORS/misconfig.');
+      }
+    } catch (e) {
+      console.error('[Diagnostics] Failed to reach Supabase Auth health endpoint:', e);
+    }
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -65,6 +85,8 @@ const SignIn = () => {
             'URL': 'Verify Supabase URL is correct',
             'Config': 'Verify Supabase configuration'
           });
+          // Run diagnostics to help identify the exact issue
+          runAuthDiagnostics();
         } else if (error.message.includes('Invalid login credentials')) {
           errorMessage = 'Invalid email or password. Please check your credentials and try again.';
         } else if (error.message.includes('Email not confirmed')) {
