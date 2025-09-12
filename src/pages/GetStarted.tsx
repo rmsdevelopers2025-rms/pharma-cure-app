@@ -44,7 +44,7 @@ const GetStarted = () => {
           </div>
           <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 text-gray-800 text-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
             <Crown className="w-12 h-12 mx-auto mb-4 text-purple-600" />
-            <h3 className="font-bold mb-2 text-lg">Premium Features</h3>
+            <h3 className="font-bold mb-2 text-lg">Advanced Features</h3>
             <p className="text-sm text-gray-600">Advanced drug analysis and personalized recommendations</p>
           </div>
         </div>

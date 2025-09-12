@@ -157,7 +157,7 @@ const Prescription = () => {
             duration: '5 days',
             sideEffects: ['Stomach pain', 'Heartburn'],
             interactions: ['Aspirin', 'Warfarin'],
-            isPremium: true
+            isPremium: false
           }
         ]
       };
@@ -316,21 +316,15 @@ const Prescription = () => {
                       </div>
                     </div>
 
-                    <div className="bg-yellow-50 p-6 rounded-xl border border-yellow-200">
-                      <h4 className="font-bold text-lg text-yellow-800 mb-3">Drug Interactions</h4>
-                      {med.isPremium ? (
-                        <div className="flex flex-wrap gap-2">
-                          {med.interactions.map((interaction: string, i: number) => (
-                            <span key={i} className="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                              {interaction}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-yellow-700 font-medium">
-                          Upgrade to Premium to view detailed drug interactions
-                        </p>
-                      )}
+                    <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                      <h4 className="font-bold text-lg text-blue-800 mb-3">Drug Interactions</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {med.interactions.map((interaction: string, i: number) => (
+                          <span key={i} className="bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                            {interaction}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

@@ -16,9 +16,3 @@ additional_redirect_urls = ["https://oxcxqjubctslypthviux.supabase.co"]
 [edge_functions]
 enabled = true
 port = 54321
-
-[functions.create-checkout-inr]
-verify_jwt = true
-
-[functions.check-subscription-inr]
-verify_jwt = true

@@ -123,29 +123,30 @@ const Dashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Premium Features */}
+            {/* Available Features */}
             <Card className="shadow-lg border border-gray-200 rounded-xl">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-xl">
-                <CardTitle className="text-xl text-gray-800">Premium Features</CardTitle>
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-green-50 rounded-t-xl">
+                <CardTitle className="text-xl text-gray-800">Available Features</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <ul className="space-y-3 text-sm text-gray-600">
                   <li className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span>Advanced drug interaction checker</span>
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Comprehensive drug information database</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span>Personalized health recommendations</span>
+                    <span>Medication reminders and scheduling</span>
                   </li>
                   <li className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>Ad-free experience</span>
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span>Nearby pharmacy locator</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <span>Prescription management</span>
                   </li>
                 </ul>
-                <Link to="/premium" className="inline-block mt-4 text-blue-600 hover:text-blue-700 font-semibold transition-colors">
-                  Explore Premium Features →
-                </Link>
               </CardContent>
             </Card>
           </div>

@@ -16,7 +16,7 @@ import Profile from "./pages/Profile";
 import Search from "./pages/Search";
 import Prescription from "./pages/Prescription";
 import NearbyPharmacies from "./pages/NearbyPharmacies";
-import Premium from "./pages/Premium";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,7 +43,7 @@ const App = () => (
                 <Route path="/search" element={<Search />} />
                 <Route path="/prescription" element={<Prescription />} />
                 <Route path="/nearby-pharmacies" element={<NearbyPharmacies />} />
-                <Route path="/premium" element={<Premium />} />
+                
               </Route>
 
               <Route path="*" element={<NotFound />} />

@@ -284,37 +284,31 @@ export default function DrugCard({ drug, onSpeak }: DrugCardProps) {
               <p className="text-sm bg-red-50 p-3 rounded-lg border border-red-200">{drug.overdose}</p>
             </div>
 
-            {/* Premium Features */}
-            {drug.isPremium && (
-              <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                <div className="flex items-center mb-2">
-                  <Crown className="w-5 h-5 mr-2 text-yellow-600" />
-                  <span className="font-semibold text-yellow-800">Premium Clinical Information</span>
-                </div>
-                <div className="space-y-2">
-                  <div>
-                    <h4 className="font-medium text-sm text-yellow-800">{t('disorders')}</h4>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {drug.disorders.map((disorder, i) => (
-                        <Badge key={i} variant="outline" className="bg-yellow-100 text-yellow-800">
-                          {disorder}
-                        </Badge>
-                      ))}
-                    </div>
+            {/* Additional Information */}
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <div className="space-y-2">
+                <div>
+                  <h4 className="font-medium text-sm text-blue-800">{t('disorders')}</h4>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {drug.disorders.map((disorder, i) => (
+                      <Badge key={i} variant="outline" className="bg-blue-100 text-blue-800">
+                        {disorder}
+                      </Badge>
+                    ))}
                   </div>
-                  <div>
-                    <h4 className="font-medium text-sm text-yellow-800">{t('incompatibility')}</h4>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {drug.incompatibility.map((incomp, i) => (
-                        <Badge key={i} variant="destructive" className="bg-red-100 text-red-800">
-                          {incomp}
-                        </Badge>
-                      ))}
-                    </div>
+                </div>
+                <div>
+                  <h4 className="font-medium text-sm text-blue-800">{t('incompatibility')}</h4>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {drug.incompatibility.map((incomp, i) => (
+                      <Badge key={i} variant="destructive" className="bg-red-100 text-red-800">
+                        {incomp}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
               </div>
-            )}
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>

@@ -11,7 +11,7 @@ const transformDrugData = (row: any): Drug => ({
   dosageForms: row.dosage_forms || [],
   disorders: row.disorders || [],
   incompatibility: row.incompatibility || [],
-  isPremium: row.is_premium || false,
+  
   category: row.category || '',
   therapeuticClass: row.therapeutic_class || '',
   pharmacologicalClass: row.pharmacological_class || '',
