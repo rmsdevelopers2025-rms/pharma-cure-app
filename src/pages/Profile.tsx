@@ -107,24 +107,53 @@ const Profile = () => {
     
     setIsSaving(true);
     try {
-      const { error } = await (supabase as any)
+      // First try to update existing profile
+      const { data: existingProfile, error: selectError } = await supabase
         .from('profiles')
-        .update({
-          name: userData.name || null,
-          age: userData.age ? parseInt(userData.age) : null,
-          height: userData.height ? parseInt(userData.height) : null,
-          weight: userData.weight ? parseInt(userData.weight) : null,
-          sex: userData.sex || null,
-          medical_info: userData.medicalInfo || null,
-          email: userData.email || null
-        })
-        .eq('id', user.id);
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
 
-      if (error) {
-        console.error('Error saving profile:', error);
+      if (selectError) {
+        console.error('Error checking profile:', selectError);
+      }
+
+      let result;
+      if (existingProfile) {
+        // Update existing profile
+        result = await supabase
+          .from('profiles')
+          .update({
+            name: userData.name || null,
+            age: userData.age ? parseInt(userData.age) : null,
+            height: userData.height ? parseFloat(userData.height) : null,
+            weight: userData.weight ? parseFloat(userData.weight) : null,
+            sex: userData.sex || null,
+            medical_info: userData.medicalInfo || null,
+            email: userData.email || null
+          })
+          .eq('id', user.id);
+      } else {
+        // Create new profile
+        result = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            name: userData.name || null,
+            age: userData.age ? parseInt(userData.age) : null,
+            height: userData.height ? parseFloat(userData.height) : null,
+            weight: userData.weight ? parseFloat(userData.weight) : null,
+            sex: userData.sex || null,
+            medical_info: userData.medicalInfo || null,
+            email: userData.email || null
+          });
+      }
+
+      if (result.error) {
+        console.error('Error saving profile:', result.error);
         toast({
           title: 'Error saving profile',
-          description: 'Failed to save your profile data.',
+          description: `Failed to save your profile data: ${result.error.message}`,
           variant: 'destructive'
         });
         return;
@@ -135,11 +164,14 @@ const Profile = () => {
         description: 'Your profile has been updated successfully.'
       });
       setIsEditing(false);
-    } catch (error) {
+      
+      // Reload profile to ensure data is synced
+      await loadUserProfile();
+    } catch (error: any) {
       console.error('Error saving profile:', error);
       toast({
         title: 'Error saving profile',
-        description: 'Failed to save your profile data.',
+        description: `Failed to save your profile data: ${error.message || 'Unknown error'}`,
         variant: 'destructive'
       });
     } finally {

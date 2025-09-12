@@ -69,6 +69,8 @@ const SignIn = () => {
           errorMessage = 'Invalid email or password. Please check your credentials and try again.';
         } else if (error.message.includes('Email not confirmed')) {
           errorMessage = 'Please check your email and click the confirmation link before signing in.';
+        } else if (error.message.includes('signup')) {
+          errorMessage = 'This email is not yet confirmed. Please check your email and click the confirmation link, or sign up if you haven\'t created an account yet.';
         }
         
         toast({ 
