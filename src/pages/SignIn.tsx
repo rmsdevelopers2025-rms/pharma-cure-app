@@ -36,6 +36,9 @@ const SignIn = () => {
 
     try {
       console.log('Attempting sign in with email:', email.trim());
+      console.log('Network connectivity check:', navigator.onLine);
+      console.log('Supabase auth URL being used:', 'https://oxcxqjubctslypthviux.supabase.co/auth/v1');
+      
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email: email.trim(), 
         password 
@@ -44,11 +47,25 @@ const SignIn = () => {
       console.log('Sign in response:', { data, error });
       
       if (error) {
-        console.error('Sign in error:', error);
+        console.error('Sign in error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name,
+          stack: error.stack
+        });
+        
         let errorMessage = error.message;
         
-        // Provide more user-friendly error messages
-        if (error.message.includes('Invalid login credentials')) {
+        // Handle specific error cases
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Network connection failed. Please check your internet connection and Supabase configuration.';
+          console.error('Fetch failed - possible causes:', {
+            'Network': 'Check internet connection',
+            'CORS': 'Check Supabase CORS settings',
+            'URL': 'Verify Supabase URL is correct',
+            'Config': 'Verify Supabase configuration'
+          });
+        } else if (error.message.includes('Invalid login credentials')) {
           errorMessage = 'Invalid email or password. Please check your credentials and try again.';
         } else if (error.message.includes('Email not confirmed')) {
           errorMessage = 'Please check your email and click the confirmation link before signing in.';
@@ -70,11 +87,23 @@ const SignIn = () => {
       });
       
       // Success - navigation will happen automatically via AuthContext
-    } catch (err) {
-      console.error('Unexpected error during sign in:', err);
+    } catch (err: any) {
+      console.error('Unexpected error during sign in:', {
+        message: err.message,
+        stack: err.stack,
+        name: err.name,
+        type: typeof err
+      });
+      
+      let errorMessage = 'An unexpected error occurred. Please try again.';
+      
+      if (err.message?.includes('Failed to fetch')) {
+        errorMessage = 'Network connection failed. Please check your internet connection and try refreshing the page.';
+      }
+      
       toast({ 
         title: 'Sign in failed', 
-        description: 'An unexpected error occurred. Please try again.',
+        description: errorMessage,
         variant: 'destructive'
       });
     }
