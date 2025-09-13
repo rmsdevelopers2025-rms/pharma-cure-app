@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import { Drug } from '@/data/drugDatabase';
 import { searchDrugs, getAutoCorrectSuggestion, getDrugSuggestions } from '@/services/drugService';
 import { saveSearchHistory } from '@/services/searchHistoryService';
-import { useAuth } from '@/contexts/AuthContext';
+
 import SearchBar from '@/components/search/SearchBar';
 import SearchResults from '@/components/search/SearchResults';
 import DrugReminder from '@/components/DrugReminder';
@@ -15,7 +15,7 @@ const Search = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [autoCorrectSuggestion, setAutoCorrectSuggestion] = useState<string | null>(null);
   const [showAutoCorrect, setShowAutoCorrect] = useState(false);
-  const { user } = useAuth();
+  
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -60,14 +60,7 @@ const Search = () => {
     setShowSuggestions(false);
     setShowAutoCorrect(false);
 
-    // Save search history if user is logged in
-    if (user) {
-      try {
-        await saveSearchHistory(user.id, searchTerm, results.length);
-      } catch (error) {
-        console.error('Failed to save search history:', error);
-      }
-    }
+    // Search history saving disabled in public mode
   };
 
   const handleSuggestionClick = (suggestion: string) => {

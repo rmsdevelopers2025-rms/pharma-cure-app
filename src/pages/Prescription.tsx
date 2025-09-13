@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, File, FileText, Loader2, X, Camera } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
+
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { savePrescription, updatePrescriptionAnalysis } from '@/services/prescriptionService';
@@ -18,7 +18,7 @@ const Prescription = () => {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [currentPrescriptionId, setCurrentPrescriptionId] = useState<string | null>(null);
   const { t } = useLanguage();
-  const { user } = useAuth();
+  
   const { toast } = useToast();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,20 +75,12 @@ const Prescription = () => {
   };
 
   const uploadAndAnalyze = async (file: File) => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to upload prescriptions",
-        variant: "destructive"
-      });
-      return;
-    }
 
     setIsUploading(true);
     
     try {
-      // Upload to Supabase Storage
-      const fileName = `${user.id}/${Date.now()}-${file.name}`;
+      // Upload to Supabase Storage (demo mode - using anonymous uploads)
+      const fileName = `demo/${Date.now()}-${file.name}`;
       const { error: uploadError } = await supabase.storage
         .from('prescriptions')
         .upload(fileName, file);
@@ -102,18 +94,10 @@ const Prescription = () => {
         .from('prescriptions')
         .getPublicUrl(fileName);
 
-      // Save prescription record to database
-      const { data: prescriptionData, error: saveError } = await savePrescription(
-        user.id,
-        publicUrl,
-        file.name
-      );
+      // Demo mode - skip database saving
+      const prescriptionData = { id: 'demo-' + Date.now() };
 
-      if (saveError) {
-        console.error('Save prescription error:', saveError);
-      } else {
-        setCurrentPrescriptionId(prescriptionData.id);
-      }
+      setCurrentPrescriptionId(prescriptionData.id);
 
       toast({
         title: "Upload successful",
@@ -165,13 +149,7 @@ const Prescription = () => {
       setIsAnalyzing(false);
       setAnalysisResult(analysisResults);
       
-      // Update prescription record with analysis results
-      if (currentPrescriptionId) {
-        const { error } = await updatePrescriptionAnalysis(currentPrescriptionId, analysisResults);
-        if (error) {
-          console.error('Update analysis error:', error);
-        }
-      }
+      // Demo mode - skip database updates
     }, 3000);
   };
 
