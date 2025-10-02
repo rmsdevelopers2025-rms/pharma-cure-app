@@ -1,14 +1,28 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Globe, Menu, X } from 'lucide-react';
+import { Globe, Menu, X, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useLanguage, languages } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const Header = () => {
   const { currentLanguage, setLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: 'Signed out',
+      description: 'You have been signed out successfully',
+    });
+    navigate('/get-started');
+  };
 
   return (
     <header className="bg-white shadow-lg border-b border-gray-200">
@@ -44,7 +58,7 @@ const Header = () => {
             </Link>
           </nav>
 
-          {/* Language Selector */}
+          {/* Language Selector and Auth */}
           <div className="flex items-center space-x-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -66,6 +80,27 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {user ? (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSignOut}
+                className="hidden md:flex text-gray-700 border-gray-300 hover:bg-gray-50"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                {t('signOut')}
+              </Button>
+            ) : (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/signin')}
+                className="hidden md:flex text-gray-700 border-gray-300 hover:bg-gray-50"
+              >
+                <User className="w-4 h-4 mr-2" />
+                {t('signIn')}
+              </Button>
+            )}
 
             {/* Mobile Menu Button */}
             <Button
@@ -95,6 +130,25 @@ const Header = () => {
               <Link to="/nearby-pharmacies" className="text-gray-700 hover:text-blue-600 transition-colors py-2 font-medium">
                 {t('nearbyPharmacies')}
               </Link>
+              {user ? (
+                <Button 
+                  variant="ghost" 
+                  onClick={handleSignOut}
+                  className="justify-start text-gray-700 hover:text-blue-600"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  {t('signOut')}
+                </Button>
+              ) : (
+                <Button 
+                  variant="ghost" 
+                  onClick={() => navigate('/signin')}
+                  className="justify-start text-gray-700 hover:text-blue-600"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  {t('signIn')}
+                </Button>
+              )}
             </nav>
           </div>
         )}
