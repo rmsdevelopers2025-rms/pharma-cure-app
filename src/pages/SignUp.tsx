@@ -16,6 +16,8 @@ const SignUp = () => {
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [sex, setSex] = useState('');
   const [age, setAge] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signUp, user } = useAuth();
   const navigate = useNavigate();
@@ -50,7 +52,7 @@ const SignUp = () => {
 
     setIsLoading(true);
 
-    const { error } = await signUp(email, password, fullName, dateOfBirth, sex, parseInt(age));
+    const { error } = await signUp(email, password, fullName, dateOfBirth, sex, parseInt(age), parseFloat(height), parseFloat(weight));
 
     if (error) {
       toast({
@@ -142,6 +144,32 @@ const SignUp = () => {
                 <option value="female">Female</option>
                 <option value="other">Other</option>
               </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="height">Height (cm)</Label>
+              <Input
+                id="height"
+                type="number"
+                placeholder="170"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                required
+                min={1}
+                step="0.1"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="weight">Weight (kg)</Label>
+              <Input
+                id="weight"
+                type="number"
+                placeholder="70"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                required
+                min={1}
+                step="0.1"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>

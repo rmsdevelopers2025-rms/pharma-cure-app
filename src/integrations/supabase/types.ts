@@ -187,9 +187,11 @@ export type Database = {
           date_of_birth: string | null
           email: string | null
           full_name: string | null
+          height: number | null
           id: string
           sex: string | null
           updated_at: string
+          weight: number | null
         }
         Insert: {
           age?: number | null
@@ -198,9 +200,11 @@ export type Database = {
           date_of_birth?: string | null
           email?: string | null
           full_name?: string | null
+          height?: number | null
           id: string
           sex?: string | null
           updated_at?: string
+          weight?: number | null
         }
         Update: {
           age?: number | null
@@ -209,9 +213,11 @@ export type Database = {
           date_of_birth?: string | null
           email?: string | null
           full_name?: string | null
+          height?: number | null
           id?: string
           sex?: string | null
           updated_at?: string
+          weight?: number | null
         }
         Relationships: []
       }
