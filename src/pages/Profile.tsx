@@ -9,6 +9,12 @@ import { supabase } from '@/integrations/supabase/client';
 interface UserProfile {
   full_name: string | null;
   email: string | null;
+  sex: string | null;
+  age: number | null;
+  height: number | null;
+  weight: number | null;
+  medical_information: string | null;
+  date_of_birth: string | null;
 }
 
 const Profile = () => {
@@ -27,7 +33,7 @@ const Profile = () => {
     
     const { data } = await supabase
       .from('profiles')
-      .select('full_name, email')
+      .select('full_name, email, sex, age, height, weight, medical_information, date_of_birth')
       .eq('id', user.id)
       .single();
     
@@ -61,13 +67,49 @@ const Profile = () => {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Name</label>
+                  <label className="text-sm font-medium text-gray-700">Full Name</label>
                   <p className="text-gray-900">{profile?.full_name || user?.email || 'Demo User'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700">Email</label>
                   <p className="text-gray-900">{profile?.email || user?.email || 'demo@pharmacure.com'}</p>
                 </div>
+                {profile?.sex && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Sex</label>
+                    <p className="text-gray-900">{profile.sex}</p>
+                  </div>
+                )}
+                {profile?.age && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Age</label>
+                    <p className="text-gray-900">{profile.age} years</p>
+                  </div>
+                )}
+                {profile?.height && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Height</label>
+                    <p className="text-gray-900">{profile.height} cm</p>
+                  </div>
+                )}
+                {profile?.weight && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Weight</label>
+                    <p className="text-gray-900">{profile.weight} kg</p>
+                  </div>
+                )}
+                {profile?.date_of_birth && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Date of Birth</label>
+                    <p className="text-gray-900">{new Date(profile.date_of_birth).toLocaleDateString()}</p>
+                  </div>
+                )}
+                {profile?.medical_information && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Medical Information</label>
+                    <p className="text-gray-900 whitespace-pre-wrap">{profile.medical_information}</p>
+                  </div>
+                )}
                 <div>
                   <label className="text-sm font-medium text-gray-700">Status</label>
                   <p className="text-gray-900">{user ? 'Authenticated' : 'Demo Mode - No authentication required'}</p>
