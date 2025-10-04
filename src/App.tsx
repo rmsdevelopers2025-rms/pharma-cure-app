@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import Search from "./pages/Search";
 import Prescription from "./pages/Prescription";
 import NearbyPharmacies from "./pages/NearbyPharmacies";
+import Subscription from "./pages/Subscription";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/search" element={<Search />} />
               <Route path="/prescription" element={<Prescription />} />
               <Route path="/nearby-pharmacies" element={<NearbyPharmacies />} />
+              <Route path="/subscription" element={<Subscription />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
