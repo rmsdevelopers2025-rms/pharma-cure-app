@@ -75,13 +75,25 @@ const Prescription = () => {
   };
 
   const uploadAndAnalyze = async (file: File) => {
-
     setIsUploading(true);
     
     try {
-      // Upload to Supabase Storage (demo mode - using anonymous uploads)
-      const fileName = `demo/${Date.now()}-${file.name}`;
-      const { error: uploadError } = await supabase.storage
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to upload prescriptions",
+          variant: "destructive"
+        });
+        setIsUploading(false);
+        return;
+      }
+
+      // Upload to Supabase Storage with user ID in path
+      const fileName = `${user.id}/${Date.now()}-${file.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('prescriptions')
         .upload(fileName, file);
 
@@ -94,10 +106,21 @@ const Prescription = () => {
         .from('prescriptions')
         .getPublicUrl(fileName);
 
-      // Demo mode - skip database saving
-      const prescriptionData = { id: 'demo-' + Date.now() };
+      // Save prescription to database
+      const { data: prescriptionData, error: dbError } = await savePrescription(
+        user.id,
+        publicUrl,
+        file.name
+      );
 
-      setCurrentPrescriptionId(prescriptionData.id);
+      if (dbError) {
+        console.error('Database save error:', dbError);
+        // Continue with analysis even if DB save fails
+      }
+
+      if (prescriptionData) {
+        setCurrentPrescriptionId(prescriptionData.id);
+      }
 
       toast({
         title: "Upload successful",
