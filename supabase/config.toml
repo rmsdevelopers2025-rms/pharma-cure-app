@@ -16,3 +16,6 @@ additional_redirect_urls = ["https://oxcxqjubctslypthviux.supabase.co"]
 [edge_functions]
 enabled = true
 port = 54321
+
+[functions.paddle-webhook]
+verify_jwt = false

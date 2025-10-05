@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Check, Crown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,10 +6,51 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 
+// Paddle configuration
+const PADDLE_VENDOR_ID = 'YOUR_PADDLE_VENDOR_ID'; // User needs to add their Paddle vendor ID
+const PADDLE_ENVIRONMENT = 'sandbox'; // Change to 'production' for live
+
+declare global {
+  interface Window {
+    Paddle: any;
+  }
+}
+
 const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [paddleLoaded, setPaddleLoaded] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  // Load Paddle.js
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
+    script.async = true;
+    script.onload = () => {
+      if (window.Paddle) {
+        window.Paddle.Environment.set(PADDLE_ENVIRONMENT);
+        window.Paddle.Setup({ 
+          vendor: parseInt(PADDLE_VENDOR_ID),
+          eventCallback: (data: any) => {
+            console.log('Paddle event:', data);
+            if (data.event === 'Checkout.Complete') {
+              toast({
+                title: 'Subscription activated!',
+                description: 'Your subscription has been successfully activated.',
+              });
+            }
+          }
+        });
+        setPaddleLoaded(true);
+      }
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [toast]);
 
   const plans = [
     {
@@ -18,6 +59,7 @@ const Subscription = () => {
       price: '₹0',
       period: 'Forever Free',
       description: 'Essential features for personal use',
+      paddlePriceId: null,
       features: [
         'Basic drug information',
         'Search functionality',
@@ -32,6 +74,7 @@ const Subscription = () => {
       price: '₹299',
       period: 'per month',
       description: 'Advanced features for healthcare professionals',
+      paddlePriceId: 'pri_premium_monthly', // Replace with actual Paddle price ID
       features: [
         'Everything in Basic',
         'Advanced drug interactions',
@@ -49,6 +92,7 @@ const Subscription = () => {
       price: '₹999',
       period: 'per month',
       description: 'Complete solution for medical practices',
+      paddlePriceId: 'pri_professional_monthly', // Replace with actual Paddle price ID
       features: [
         'Everything in Premium',
         'API access',
@@ -71,10 +115,59 @@ const Subscription = () => {
       return;
     }
 
+    const plan = plans.find(p => p.id === planId);
+    
+    if (!plan) return;
+
+    // Free plan
+    if (plan.id === 'basic') {
+      toast({
+        title: 'Already on Basic plan',
+        description: 'You are already using the free Basic plan',
+      });
+      return;
+    }
+
+    // Check if Paddle is loaded
+    if (!paddleLoaded || !window.Paddle) {
+      toast({
+        title: 'Loading payment system',
+        description: 'Please wait a moment and try again',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!plan.paddlePriceId) {
+      toast({
+        title: 'Configuration needed',
+        description: 'Paddle price ID not configured for this plan',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setSelectedPlan(planId);
-    toast({
-      title: 'Coming soon!',
-      description: 'Payment integration will be available soon',
+
+    // Open Paddle checkout
+    window.Paddle.Checkout.open({
+      items: [
+        {
+          priceId: plan.paddlePriceId,
+          quantity: 1
+        }
+      ],
+      customData: {
+        user_id: user.id
+      },
+      customer: {
+        email: user.email
+      },
+      settings: {
+        displayMode: 'overlay',
+        theme: 'light',
+        locale: 'en'
+      }
     });
   };
 
