@@ -1,5 +1,5 @@
 
-import { Volume2, AlertTriangle, Shield, Crown, Info, Heart, Clock, Pill, Beaker, Book } from 'lucide-react';
+import { Volume2, AlertTriangle, Shield, Crown, Info, Heart, Clock, Pill, Beaker } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -69,10 +69,9 @@ export default function DrugCard({ drug, onSpeak }: DrugCardProps) {
       
       <CardContent className="p-6">
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="clinical">Clinical</TabsTrigger>
-            <TabsTrigger value="pharma">Pharmacology</TabsTrigger>
             <TabsTrigger value="safety">Safety</TabsTrigger>
           </TabsList>
           
@@ -174,57 +173,6 @@ export default function DrugCard({ drug, onSpeak }: DrugCardProps) {
             </div>
           </TabsContent>
 
-          <TabsContent value="pharma" className="space-y-4 mt-4">
-            {/* Pharmacokinetics */}
-            <div>
-              <h3 className="font-semibold text-lg mb-2 flex items-center">
-                <Book className="w-5 h-5 mr-2 text-green-500" />
-                Pharmacokinetics
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-sm mb-1">Absorption:</h4>
-                    <p className="text-sm">{drug.pharmacokinetics.absorption}</p>
-                  </div>
-                  <div className="bg-green-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-sm mb-1">Distribution:</h4>
-                    <p className="text-sm">{drug.pharmacokinetics.distribution}</p>
-                  </div>
-                  <div className="bg-yellow-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-sm mb-1">Metabolism:</h4>
-                    <p className="text-sm">{drug.pharmacokinetics.metabolism}</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="bg-purple-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-sm mb-1">Elimination:</h4>
-                    <p className="text-sm">{drug.pharmacokinetics.elimination}</p>
-                  </div>
-                  <div className="bg-red-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-sm mb-1">Half-life:</h4>
-                    <p className="text-sm">{drug.pharmacokinetics.halfLife}</p>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-sm mb-1">Bioavailability:</h4>
-                    <p className="text-sm">{drug.pharmacokinetics.bioavailability}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Drug Interactions */}
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Drug Interactions</h3>
-              <div className="flex flex-wrap gap-2">
-                {drug.drugInteractions.map((interaction, i) => (
-                  <Badge key={i} variant="destructive" className="bg-red-100 text-red-800">
-                    {interaction}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
 
           <TabsContent value="safety" className="space-y-4 mt-4">
             {/* Side Effects */}
