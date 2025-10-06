@@ -31,17 +31,10 @@ export type Database = {
           incompatibility: string[]
           indications: string[] | null
           is_premium: boolean
-          lactation: string | null
-          mechanism: string | null
-          monitoring: string[] | null
           name: string
           overdose: string | null
-          pharmacokinetics: Json | null
-          pharmacological_class: string | null
-          pregnancy_category: string | null
           side_effects: string[]
           storage: string | null
-          therapeutic_class: string | null
           updated_at: string
           warnings: string[] | null
         }
@@ -61,17 +54,10 @@ export type Database = {
           incompatibility?: string[]
           indications?: string[] | null
           is_premium?: boolean
-          lactation?: string | null
-          mechanism?: string | null
-          monitoring?: string[] | null
           name: string
           overdose?: string | null
-          pharmacokinetics?: Json | null
-          pharmacological_class?: string | null
-          pregnancy_category?: string | null
           side_effects?: string[]
           storage?: string | null
-          therapeutic_class?: string | null
           updated_at?: string
           warnings?: string[] | null
         }
@@ -91,17 +77,10 @@ export type Database = {
           incompatibility?: string[]
           indications?: string[] | null
           is_premium?: boolean
-          lactation?: string | null
-          mechanism?: string | null
-          monitoring?: string[] | null
           name?: string
           overdose?: string | null
-          pharmacokinetics?: Json | null
-          pharmacological_class?: string | null
-          pregnancy_category?: string | null
           side_effects?: string[]
           storage?: string | null
-          therapeutic_class?: string | null
           updated_at?: string
           warnings?: string[] | null
         }
@@ -588,17 +567,10 @@ export type Database = {
           incompatibility: string[]
           indications: string[] | null
           is_premium: boolean
-          lactation: string | null
-          mechanism: string | null
-          monitoring: string[] | null
           name: string
           overdose: string | null
-          pharmacokinetics: Json | null
-          pharmacological_class: string | null
-          pregnancy_category: string | null
           side_effects: string[]
           storage: string | null
-          therapeutic_class: string | null
           updated_at: string
           warnings: string[] | null
         }[]
