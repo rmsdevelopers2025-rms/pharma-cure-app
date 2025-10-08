@@ -141,38 +141,44 @@ const Prescription = () => {
     }
   };
 
-  const analyzePresecription = (file: File) => {
+  const analyzePresecription = async (file: File) => {
     setIsAnalyzing(true);
     
-    // Simulate AI analysis
+    // Note: This is a placeholder for real OCR/AI analysis
+    // In production, you would integrate with an AI service like:
+    // - Google Cloud Vision API
+    // - AWS Textract
+    // - Azure Computer Vision
+    // - Lovable AI Gateway
+    
     setTimeout(async () => {
+      // Placeholder analysis - replace with actual AI/OCR service
       const analysisResults = {
         medications: [
           {
-            name: 'Amoxicillin',
-            dosage: '500mg',
-            frequency: '3 times daily',
-            duration: '7 days',
-            sideEffects: ['Nausea', 'Diarrhea', 'Skin rash'],
-            interactions: ['Warfarin'],
-            isPremium: false
-          },
-          {
-            name: 'Ibuprofen',
-            dosage: '400mg',
-            frequency: '2 times daily',
-            duration: '5 days',
-            sideEffects: ['Stomach pain', 'Heartburn'],
-            interactions: ['Aspirin', 'Warfarin'],
+            name: 'Prescription Analysis Pending',
+            dosage: 'AI analysis not yet configured',
+            frequency: 'This is a demo result',
+            duration: 'Please integrate an OCR/AI service',
+            sideEffects: ['Real prescription analysis requires AI integration'],
+            interactions: ['Configure AI service for accurate results'],
             isPremium: false
           }
-        ]
+        ],
+        note: 'To enable real prescription analysis, integrate an OCR/AI service in this function.'
       };
       
       setIsAnalyzing(false);
       setAnalysisResult(analysisResults);
       
-      // Demo mode - skip database updates
+      // Update database with analysis results if prescription was saved
+      if (currentPrescriptionId) {
+        try {
+          await updatePrescriptionAnalysis(currentPrescriptionId, analysisResults);
+        } catch (error) {
+          console.error('Failed to update analysis results:', error);
+        }
+      }
     }, 3000);
   };
 
