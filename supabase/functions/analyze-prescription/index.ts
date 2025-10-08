@@ -21,9 +21,52 @@ serve(async (req) => {
     console.log('Analyzing prescription image:', imageUrl);
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
+
+    // Initialize Supabase client with service role to access private storage
+    const supabase = createClient(
+      SUPABASE_URL!,
+      SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // Extract bucket and path from the image URL
+    const urlParts = imageUrl.split('/storage/v1/object/public/');
+    if (urlParts.length !== 2) {
+      throw new Error('Invalid image URL format');
+    }
+    
+    const [bucketName, ...pathParts] = urlParts[1].split('/');
+    const filePath = pathParts.join('/');
+
+    console.log('Downloading from bucket:', bucketName, 'path:', filePath);
+
+    // Download the image from Supabase Storage
+    const { data: imageData, error: downloadError } = await supabase.storage
+      .from(bucketName)
+      .download(filePath);
+
+    if (downloadError) {
+      console.error('Storage download error:', downloadError);
+      throw new Error(`Failed to download image: ${downloadError.message}`);
+    }
+
+    // Convert blob to base64
+    const arrayBuffer = await imageData.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    const base64Image = btoa(binary);
+    const mimeType = imageData.type || 'image/jpeg';
+    const dataUrl = `data:${mimeType};base64,${base64Image}`;
+
+    console.log('Image converted to base64, size:', base64Image.length);
 
     // Call Lovable AI Gateway with vision model
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -48,12 +91,12 @@ serve(async (req) => {
 - sideEffects: array of common side effects
 - interactions: array of known drug interactions
 
-Return the data as a JSON object with a "medications" array. If you cannot read the prescription clearly, return an empty medications array.`
+Return the data as a JSON object with a "medications" array.`
               },
               {
                 type: 'image_url',
                 image_url: {
-                  url: imageUrl
+                  url: dataUrl
                 }
               }
             ]
