@@ -127,8 +127,8 @@ const Prescription = () => {
         description: "Prescription image uploaded successfully"
       });
 
-      // Analyze prescription
-      analyzePresecription(file);
+      // Analyze prescription using the uploaded image URL
+      analyzePresecription(publicUrl);
     } catch (error) {
       console.error('Upload error:', error);
       toast({
@@ -141,45 +141,51 @@ const Prescription = () => {
     }
   };
 
-  const analyzePresecription = async (file: File) => {
+  const analyzePresecription = async (imageUrl: string) => {
     setIsAnalyzing(true);
     
-    // Note: This is a placeholder for real OCR/AI analysis
-    // In production, you would integrate with an AI service like:
-    // - Google Cloud Vision API
-    // - AWS Textract
-    // - Azure Computer Vision
-    // - Lovable AI Gateway
-    
-    setTimeout(async () => {
-      // Placeholder analysis - replace with actual AI/OCR service
-      const analysisResults = {
-        medications: [
-          {
-            name: 'Prescription Analysis Pending',
-            dosage: 'AI analysis not yet configured',
-            frequency: 'This is a demo result',
-            duration: 'Please integrate an OCR/AI service',
-            sideEffects: ['Real prescription analysis requires AI integration'],
-            interactions: ['Configure AI service for accurate results'],
-            isPremium: false
-          }
-        ],
-        note: 'To enable real prescription analysis, integrate an OCR/AI service in this function.'
-      };
-      
-      setIsAnalyzing(false);
-      setAnalysisResult(analysisResults);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-prescription', {
+        body: { imageUrl }
+      });
+
+      if (error) {
+        console.error('Error calling edge function:', error);
+        toast({
+          title: "Analysis failed",
+          description: "Failed to analyze prescription. Please try again.",
+          variant: "destructive"
+        });
+        setIsAnalyzing(false);
+        return;
+      }
+
+      console.log('Analysis results:', data);
+      setAnalysisResult(data);
       
       // Update database with analysis results if prescription was saved
       if (currentPrescriptionId) {
         try {
-          await updatePrescriptionAnalysis(currentPrescriptionId, analysisResults);
+          await updatePrescriptionAnalysis(currentPrescriptionId, data);
         } catch (error) {
           console.error('Failed to update analysis results:', error);
         }
       }
-    }, 3000);
+
+      toast({
+        title: "Analysis complete",
+        description: `Found ${data.medications?.length || 0} medication(s)`,
+      });
+    } catch (error) {
+      console.error('Analysis error:', error);
+      toast({
+        title: "Analysis failed",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const clearUpload = () => {

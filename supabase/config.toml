@@ -1,5 +1,8 @@
 project_id = "oxcxqjubctslypthviux"
 
+[functions.analyze-prescription]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321
