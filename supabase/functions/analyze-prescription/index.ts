@@ -25,12 +25,6 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Download the image and convert to base64
-    const imageResponse = await fetch(imageUrl);
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const base64Image = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
-    const imageDataUrl = `data:image/jpeg;base64,${base64Image}`;
-
     // Call Lovable AI Gateway with vision model
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -41,10 +35,6 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          {
-            role: 'system',
-            content: 'You are a medical prescription analyzer. Extract medication information from prescription images and return structured data in JSON format.'
-          },
           {
             role: 'user',
             content: [
@@ -58,12 +48,12 @@ serve(async (req) => {
 - sideEffects: array of common side effects
 - interactions: array of known drug interactions
 
-Return the data as a JSON object with a "medications" array. If you cannot read the prescription clearly, return an empty medications array with an error message.`
+Return the data as a JSON object with a "medications" array. If you cannot read the prescription clearly, return an empty medications array.`
               },
               {
                 type: 'image_url',
                 image_url: {
-                  url: imageDataUrl
+                  url: imageUrl
                 }
               }
             ]
