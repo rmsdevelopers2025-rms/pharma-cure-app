@@ -312,9 +312,17 @@ const Prescription = () => {
                 <Card key={index} className="shadow-lg border border-gray-200 rounded-xl">
                   <CardHeader className="bg-gradient-to-r from-blue-50 to-green-50 rounded-t-xl">
                     <CardTitle className="text-2xl text-gray-800">{med.name}</CardTitle>
-                    <p className="text-gray-600 font-medium">
-                      {med.dosage} - {med.frequency} for {med.duration}
-                    </p>
+                    <div className="space-y-1 mt-2">
+                      <p className="text-gray-700 font-medium">
+                        <span className="font-bold">Dosage Form:</span> {med.dosageForm || 'N/A'}
+                      </p>
+                      <p className="text-gray-700 font-medium">
+                        <span className="font-bold">Dose:</span> {med.dosage}
+                      </p>
+                      <p className="text-gray-700 font-medium">
+                        <span className="font-bold">Frequency:</span> {med.frequency} for {med.duration}
+                      </p>
+                    </div>
                   </CardHeader>
                   
                   <CardContent className="p-6 space-y-6">

@@ -86,6 +86,7 @@ serve(async (req) => {
                 text: `Analyze this prescription image and extract all medications. For each medication, provide:
 - name: medication name
 - dosage: dosage amount (e.g., "500mg")
+- dosageForm: dosage form (e.g., "tablet", "capsule", "syrup", "injection")
 - frequency: how often to take it (e.g., "3 times daily")
 - duration: treatment duration (e.g., "7 days")
 - sideEffects: array of common side effects
