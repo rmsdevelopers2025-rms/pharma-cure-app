@@ -128,7 +128,7 @@ const Prescription = () => {
       });
 
       // Analyze prescription using the uploaded image URL
-      analyzePresecription(publicUrl);
+      analyzePresecription(publicUrl, prescriptionData.id);
     } catch (error) {
       console.error('Upload error:', error);
       toast({
@@ -141,7 +141,7 @@ const Prescription = () => {
     }
   };
 
-  const analyzePresecription = async (imageUrl: string) => {
+  const analyzePresecription = async (imageUrl: string, prescriptionId: string) => {
     setIsAnalyzing(true);
     
     try {
@@ -163,13 +163,21 @@ const Prescription = () => {
       console.log('Analysis results:', data);
       setAnalysisResult(data);
       
-      // Update database with analysis results if prescription was saved
-      if (currentPrescriptionId) {
-        try {
-          await updatePrescriptionAnalysis(currentPrescriptionId, data);
-        } catch (error) {
-          console.error('Failed to update analysis results:', error);
+      // Update database with analysis results
+      try {
+        const { error: updateError } = await updatePrescriptionAnalysis(prescriptionId, data);
+        if (updateError) {
+          console.error('Failed to update analysis results:', updateError);
+          toast({
+            title: "Warning",
+            description: "Analysis completed but failed to save to database",
+            variant: "destructive"
+          });
+        } else {
+          console.log('Analysis results saved to database');
         }
+      } catch (error) {
+        console.error('Failed to update analysis results:', error);
       }
 
       toast({
