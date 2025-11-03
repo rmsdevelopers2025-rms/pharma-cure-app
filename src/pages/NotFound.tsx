@@ -1,5 +1,5 @@
 
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -30,10 +30,10 @@ const NotFound = () => {
           Oops! The page you're looking for doesn't exist.
         </p>
         <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg">
-          <a href="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <ArrowLeft className="w-4 h-4" />
             <span>Return to Home</span>
-          </a>
+          </Link>
         </Button>
       </div>
     </div>
