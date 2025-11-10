@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { API_ENDPOINTS } from '@/config/api';
 
 export interface Pharmacy {
   id: string;
@@ -13,17 +13,19 @@ export interface Pharmacy {
 }
 
 export const getNearbyPharmacies = async () => {
-  const { data, error } = await supabase
-    .from('nearby_pharmacies')
-    .select('*')
-    .order('name');
-  
-  if (error) {
+  try {
+    const response = await fetch(API_ENDPOINTS.PHARMACIES);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch pharmacies');
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
     console.error('Error fetching pharmacies:', error);
     throw error;
   }
-  
-  return data;
 };
 
 // Calculate distance between two coordinates in kilometers

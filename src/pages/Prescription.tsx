@@ -2,13 +2,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, File, FileText, Loader2, X, Camera } from 'lucide-react';
+import { Upload, FileText, Loader2, X, Camera } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { savePrescription, updatePrescriptionAnalysis } from '@/services/prescriptionService';
 import Header from '@/components/Header';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Prescription = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -18,8 +17,8 @@ const Prescription = () => {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [currentPrescriptionId, setCurrentPrescriptionId] = useState<string | null>(null);
   const { t } = useLanguage();
-  
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -75,47 +74,23 @@ const Prescription = () => {
   };
 
   const uploadAndAnalyze = async (file: File) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to upload prescriptions",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsUploading(true);
     
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to upload prescriptions",
-          variant: "destructive"
-        });
-        setIsUploading(false);
-        return;
-      }
-
-      // Upload to Supabase Storage with user ID in path
-      const fileName = `${user.id}/${Date.now()}-${file.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('prescriptions')
-        .upload(fileName, file);
+      // Save prescription (uploads to backend)
+      const { data: prescriptionData, error: uploadError } = await savePrescription(file);
 
       if (uploadError) {
-        throw uploadError;
-      }
-
-      // Get public URL for the uploaded file
-      const { data: { publicUrl } } = supabase.storage
-        .from('prescriptions')
-        .getPublicUrl(fileName);
-
-      // Save prescription to database
-      const { data: prescriptionData, error: dbError } = await savePrescription(
-        user.id,
-        publicUrl,
-        file.name
-      );
-
-      if (dbError) {
-        console.error('Database save error:', dbError);
-        // Continue with analysis even if DB save fails
+        throw new Error(uploadError);
       }
 
       if (prescriptionData) {
@@ -127,72 +102,27 @@ const Prescription = () => {
         description: "Prescription image uploaded successfully"
       });
 
-      // Analyze prescription using the uploaded image URL
-      analyzePresecription(publicUrl, prescriptionData.id);
-    } catch (error) {
+      // Note: Prescription analysis requires additional backend setup with AI service
+      setAnalysisResult({
+        medications: [{
+          name: "Analysis pending",
+          dosageForm: "Please configure AI service in backend",
+          dosage: "N/A",
+          frequency: "N/A",
+          duration: "N/A",
+          sideEffects: ["Check backend logs for details"],
+          interactions: ["AI analysis not configured"]
+        }]
+      });
+    } catch (error: any) {
       console.error('Upload error:', error);
       toast({
         title: "Upload failed",
-        description: "Failed to upload prescription image",
+        description: error.message || "Failed to upload prescription image",
         variant: "destructive"
       });
     } finally {
       setIsUploading(false);
-    }
-  };
-
-  const analyzePresecription = async (imageUrl: string, prescriptionId: string) => {
-    setIsAnalyzing(true);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('analyze-prescription', {
-        body: { imageUrl }
-      });
-
-      if (error) {
-        console.error('Error calling edge function:', error);
-        toast({
-          title: "Analysis failed",
-          description: "Failed to analyze prescription. Please try again.",
-          variant: "destructive"
-        });
-        setIsAnalyzing(false);
-        return;
-      }
-
-      console.log('Analysis results:', data);
-      setAnalysisResult(data);
-      
-      // Update database with analysis results
-      try {
-        const { error: updateError } = await updatePrescriptionAnalysis(prescriptionId, data);
-        if (updateError) {
-          console.error('Failed to update analysis results:', updateError);
-          toast({
-            title: "Warning",
-            description: "Analysis completed but failed to save to database",
-            variant: "destructive"
-          });
-        } else {
-          console.log('Analysis results saved to database');
-        }
-      } catch (error) {
-        console.error('Failed to update analysis results:', error);
-      }
-
-      toast({
-        title: "Analysis complete",
-        description: `Found ${data.medications?.length || 0} medication(s)`,
-      });
-    } catch (error) {
-      console.error('Analysis error:', error);
-      toast({
-        title: "Analysis failed",
-        description: "An unexpected error occurred",
-        variant: "destructive"
-      });
-    } finally {
-      setIsAnalyzing(false);
     }
   };
 

@@ -1,10 +1,15 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { API_ENDPOINTS, getAuthHeaders, setAuthToken, removeAuthToken, getAuthToken } from '@/config/api';
+
+interface User {
+  id: string;
+  email: string;
+  full_name?: string;
+}
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
+  session: { token: string } | null;
   signUp: (email: string, password: string, fullName: string, sex: string, age: number, height: number, weight: number, medicalInformation: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -23,60 +28,96 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<{ token: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+    // Check for existing token
+    const checkAuth = async () => {
+      const token = getAuthToken();
+      if (token) {
+        try {
+          const response = await fetch(API_ENDPOINTS.ME, {
+            headers: getAuthHeaders(),
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setUser(data.user);
+            setSession({ token });
+          } else {
+            removeAuthToken();
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          removeAuthToken();
+        }
       }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
       setLoading(false);
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    checkAuth();
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string, sex: string, age: number, height: number, weight: number, medicalInformation: string) => {
-    const redirectUrl = `${window.location.origin}/dashboard`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName,
-          sex: sex,
-          age: age,
-          height: height,
-          weight: weight,
-          medical_information: medicalInformation,
-        },
-      },
-    });
-    return { error };
+    try {
+      const response = await fetch(API_ENDPOINTS.SIGNUP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          fullName,
+          sex,
+          age,
+          height,
+          weight,
+          medicalInformation,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: { message: data.error || 'Failed to sign up' } };
+      }
+
+      setAuthToken(data.token);
+      setUser(data.user);
+      setSession({ token: data.token });
+      return { error: null };
+    } catch (error: any) {
+      return { error: { message: error.message || 'Network error' } };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      const response = await fetch(API_ENDPOINTS.SIGNIN, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: { message: data.error || 'Failed to sign in' } };
+      }
+
+      setAuthToken(data.token);
+      setUser(data.user);
+      setSession({ token: data.token });
+      return { error: null };
+    } catch (error: any) {
+      return { error: { message: error.message || 'Network error' } };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    removeAuthToken();
+    setUser(null);
+    setSession(null);
   };
 
   const value = {
