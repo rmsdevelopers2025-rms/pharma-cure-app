@@ -49,34 +49,34 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <Header />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-8">
-            <User className="w-16 h-16 mx-auto mb-4 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="text-center mb-6 sm:mb-8">
+            <User className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-3 sm:mb-4 text-blue-600" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               {t('profile')}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600 px-4">
               {user ? 'Manage your profile settings' : 'Profile management is not available in demo mode'}
             </p>
           </div>
 
-          <Card>
+          <Card className="mx-2 sm:mx-0">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="w-5 h-5" />
                 {user ? 'Profile' : 'Demo Profile'}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="p-4 sm:p-6">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Full Name</label>
-                  <p className="text-gray-900">{profile?.full_name || user?.email || 'Demo User'}</p>
+                  <label className="text-xs sm:text-sm font-medium text-gray-700">Full Name</label>
+                  <p className="text-sm sm:text-base text-gray-900 break-words">{profile?.full_name || user?.email || 'Demo User'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Email</label>
-                  <p className="text-gray-900">{profile?.email || user?.email || 'demo@pharmacure.com'}</p>
+                  <label className="text-xs sm:text-sm font-medium text-gray-700">Email</label>
+                  <p className="text-sm sm:text-base text-gray-900 break-words">{profile?.email || user?.email || 'demo@pharmacure.com'}</p>
                 </div>
                 {profile?.sex && (
                   <div>

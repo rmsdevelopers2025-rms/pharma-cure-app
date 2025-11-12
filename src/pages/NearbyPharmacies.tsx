@@ -101,28 +101,28 @@ const NearbyPharmacies = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto">
-          <Card className="mb-8">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
-              <CardTitle className="text-2xl text-center flex items-center justify-center">
-                <MapPin className="w-8 h-8 mr-2" />
-                {t('nearbyPharmacies') || 'Nearby Pharmacies'}
+          <Card className="mb-6 sm:mb-8">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 sm:p-6">
+              <CardTitle className="text-lg sm:text-xl lg:text-2xl text-center flex flex-col sm:flex-row items-center justify-center gap-2">
+                <MapPin className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
+                <span>{t('nearbyPharmacies') || 'Nearby Pharmacies'}</span>
               </CardTitle>
-              <p className="text-center text-gray-600 mt-2">
+              <p className="text-center text-sm sm:text-base text-gray-600 mt-2">
                 {t('findPharmaciesNearYou') || 'Find pharmacies near your location'}
               </p>
             </CardHeader>
             
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="text-center">
                 <Button 
                   onClick={getLocation}
                   disabled={loading}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white w-full sm:w-auto px-6 sm:px-8"
                 >
                   <MapPin className="w-4 h-4 mr-2" />
-                  {loading ? (t('findingPharmacies') || 'Finding Pharmacies...') : (t('findPharmacies') || 'Find Pharmacies')}
+                  <span className="text-sm sm:text-base">{loading ? (t('findingPharmacies') || 'Finding Pharmacies...') : (t('findPharmacies') || 'Find Pharmacies')}</span>
                 </Button>
               </div>
             </div>
@@ -130,73 +130,78 @@ const NearbyPharmacies = () => {
 
           {/* Pharmacies List */}
           {pharmacies.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold mb-4">
+            <div className="space-y-3 sm:space-y-4">
+              <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 px-2 sm:px-0">
                 {t('foundPharmacies') || `Found ${pharmacies.length} ${pharmacies.length === 1 ? 'pharmacy' : 'pharmacies'}`}
               </h2>
               
               {pharmacies.map((pharmacy) => (
                 <Card key={pharmacy.id} className="hover:shadow-lg transition-shadow">
-                  <div className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold mb-2">{pharmacy.name}</h3>
+                  <div className="p-4 sm:p-5 lg:p-6">
+                    <div className="flex flex-col sm:flex-row justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">{pharmacy.name}</h3>
                         
-                        <div className="space-y-2 text-sm text-gray-600">
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-2 text-blue-500" />
-                            {pharmacy.address}
+                        <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
+                          <div className="flex items-start">
+                            <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-blue-500 flex-shrink-0 mt-0.5" />
+                            <span className="break-words">{pharmacy.address}</span>
                           </div>
                           
                           {'distance' in pharmacy && pharmacy.distance !== undefined && (
                             <div className="flex items-center">
-                              <Navigation className="w-4 h-4 mr-2 text-green-500" />
-                              {pharmacy.distance.toFixed(2)} km away
+                              <Navigation className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-green-500 flex-shrink-0" />
+                              <span>{pharmacy.distance.toFixed(2)} km away</span>
                             </div>
                           )}
                           
                           {pharmacy.operating_hours && (
-                            <div className="flex items-center">
-                              <Clock className="w-4 h-4 mr-2 text-orange-500" />
-                              {typeof pharmacy.operating_hours === 'string' 
-                                ? pharmacy.operating_hours 
-                                : (pharmacy.operating_hours as any).hours || 'Hours not available'}
+                            <div className="flex items-start">
+                              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-orange-500 flex-shrink-0 mt-0.5" />
+                              <span className="break-words">
+                                {typeof pharmacy.operating_hours === 'string' 
+                                  ? pharmacy.operating_hours 
+                                  : (pharmacy.operating_hours as any).hours || 'Hours not available'}
+                              </span>
                             </div>
                           )}
                           
                           {pharmacy.phone_number && (
                             <div className="flex items-center">
-                              <Phone className="w-4 h-4 mr-2 text-purple-500" />
-                              {pharmacy.phone_number}
+                              <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-purple-500 flex-shrink-0" />
+                              <a href={`tel:${pharmacy.phone_number}`} className="hover:text-purple-600 hover:underline">
+                                {pharmacy.phone_number}
+                              </a>
                             </div>
                           )}
                         </div>
                         
                         {pharmacy.rating && (
-                          <div className="flex items-center mt-3">
-                            <div className="flex text-yellow-400">
+                          <div className="flex items-center mt-2 sm:mt-3">
+                            <div className="flex text-yellow-400 text-sm sm:text-base">
                               {[...Array(5)].map((_, i) => (
                                 <span key={i} className={i < Math.floor(Number(pharmacy.rating)) ? 'text-yellow-400' : 'text-gray-300'}>
                                   ★
                                 </span>
                               ))}
                             </div>
-                            <span className="ml-2 text-sm text-gray-600">
+                            <span className="ml-2 text-xs sm:text-sm text-gray-600">
                               {Number(pharmacy.rating).toFixed(1)}/5
                             </span>
                           </div>
                         )}
                       </div>
                       
-                      <div className="flex flex-col space-y-2 ml-4">
+                      <div className="flex sm:flex-col gap-2 sm:space-y-0 sm:ml-4">
                         <Button
                           onClick={() => getDirections(pharmacy.address)}
                           variant="outline"
                           size="sm"
-                          className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
+                          className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 flex-1 sm:flex-initial text-xs sm:text-sm"
                         >
-                          <Navigation className="w-4 h-4 mr-1" />
-                          {t('directions') || 'Directions'}
+                          <Navigation className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
+                          <span className="hidden sm:inline">{t('directions') || 'Directions'}</span>
+                          <span className="sm:hidden">Map</span>
                         </Button>
                         
                         {pharmacy.phone_number && (
@@ -204,9 +209,9 @@ const NearbyPharmacies = () => {
                             onClick={() => window.open(`tel:${pharmacy.phone_number}`, '_self')}
                             variant="outline"
                             size="sm"
-                            className="bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+                            className="bg-green-50 text-green-600 border-green-200 hover:bg-green-100 flex-1 sm:flex-initial text-xs sm:text-sm"
                           >
-                            <Phone className="w-4 h-4 mr-1" />
+                            <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
                             {t('call') || 'Call'}
                           </Button>
                         )}

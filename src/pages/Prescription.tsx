@@ -133,12 +133,12 @@ const Prescription = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto">
-          <Card className="mb-8 shadow-lg border border-gray-200 rounded-xl">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-xl">
-              <CardTitle className="text-3xl text-center flex items-center justify-center space-x-3">
-                <div className="w-10 h-10">
+          <Card className="mb-6 sm:mb-8 shadow-lg border border-gray-200 rounded-xl">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-xl p-4 sm:p-6">
+              <CardTitle className="text-xl sm:text-2xl lg:text-3xl text-center flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 flex-shrink-0">
                   <img 
                     src="/lovable-uploads/b5751d8a-2aa5-4a0f-98b6-4a3ef09935da.png" 
                     alt="PharmaCure Logo" 
@@ -147,20 +147,20 @@ const Prescription = () => {
                 </div>
                 <span className="text-gray-800">{t('prescription')} Analysis</span>
               </CardTitle>
-              <p className="text-center text-gray-600 mt-2">
+              <p className="text-center text-sm sm:text-base text-gray-600 mt-2 px-2">
                 Upload your prescription to get detailed drug information and safety analysis
               </p>
             </CardHeader>
             
-            <CardContent className="p-8">
+            <CardContent className="p-4 sm:p-6 lg:p-8">
               {!uploadedFile ? (
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   {/* File Upload */}
                   <label htmlFor="file-upload" className="block cursor-pointer">
-                    <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors bg-blue-50/50">
-                      <Upload className="w-16 h-16 mx-auto mb-4 text-blue-500" />
-                      <h3 className="font-bold mb-2 text-lg text-gray-800">Upload from Gallery</h3>
-                      <p className="text-sm text-gray-600 mb-6">Choose image from your device</p>
+                    <div className="border-2 border-dashed border-blue-300 rounded-lg sm:rounded-xl p-6 sm:p-8 text-center hover:border-blue-400 transition-colors bg-blue-50/50 min-h-[200px] sm:min-h-0 flex flex-col justify-center">
+                      <Upload className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-3 sm:mb-4 text-blue-500" />
+                      <h3 className="font-bold mb-1 sm:mb-2 text-base sm:text-lg text-gray-800">Upload from Gallery</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6 px-2">Choose image from your device</p>
                       <input
                         type="file"
                         accept="image/*"
@@ -168,18 +168,18 @@ const Prescription = () => {
                         className="hidden"
                         id="file-upload"
                       />
-                      <Button variant="outline" className="pointer-events-none border-blue-500 text-blue-600 hover:bg-blue-50">
+                      <Button variant="outline" className="pointer-events-none border-blue-500 text-blue-600 hover:bg-blue-50 text-sm sm:text-base">
                         Select File
                       </Button>
                     </div>
                   </label>
 
                   {/* Camera Capture */}
-                  <div className="border-2 border-dashed border-green-300 rounded-xl p-8 text-center hover:border-green-400 transition-colors bg-green-50/50">
-                    <Camera className="w-16 h-16 mx-auto mb-4 text-green-500" />
-                    <h3 className="font-bold mb-2 text-lg text-gray-800">Take Photo</h3>
-                    <p className="text-sm text-gray-600 mb-6">Capture prescription with camera</p>
-                    <Button variant="outline" onClick={handleCameraCapture} className="border-green-500 text-green-600 hover:bg-green-50">
+                  <div className="border-2 border-dashed border-green-300 rounded-lg sm:rounded-xl p-6 sm:p-8 text-center hover:border-green-400 transition-colors bg-green-50/50 cursor-pointer min-h-[200px] sm:min-h-0 flex flex-col justify-center" onClick={handleCameraCapture}>
+                    <Camera className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-3 sm:mb-4 text-green-500" />
+                    <h3 className="font-bold mb-1 sm:mb-2 text-base sm:text-lg text-gray-800">Take Photo</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6 px-2">Capture prescription with camera</p>
+                    <Button variant="outline" className="pointer-events-none border-green-500 text-green-600 hover:bg-green-50 text-sm sm:text-base">
                       Open Camera
                     </Button>
                   </div>
