@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import { useEffect, useState } from 'react';
-import { API_ENDPOINTS, getAuthHeaders } from '@/config/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserProfile {
   full_name: string | null;
@@ -32,12 +32,13 @@ const Profile = () => {
     if (!user) return;
     
     try {
-      const response = await fetch(API_ENDPOINTS.PROFILE, {
-        headers: getAuthHeaders(),
-      });
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
       
-      if (response.ok) {
-        const data = await response.json();
+      if (data && !error) {
         setProfile(data);
       }
     } catch (error) {

@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '@/config/api';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Pharmacy {
   id: string;
@@ -14,13 +14,15 @@ export interface Pharmacy {
 
 export const getNearbyPharmacies = async () => {
   try {
-    const response = await fetch(API_ENDPOINTS.PHARMACIES);
+    const { data, error } = await supabase
+      .from('nearby_pharmacies')
+      .select('*')
+      .order('name');
     
-    if (!response.ok) {
+    if (error) {
       throw new Error('Failed to fetch pharmacies');
     }
     
-    const data = await response.json();
     return data;
   } catch (error) {
     console.error('Error fetching pharmacies:', error);

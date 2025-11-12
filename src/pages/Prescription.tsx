@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, FileText, Loader2, X, Camera } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
-import { savePrescription, updatePrescriptionAnalysis } from '@/services/prescriptionService';
+import { savePrescription } from '@/services/prescriptionService';
 import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -86,34 +86,30 @@ const Prescription = () => {
     setIsUploading(true);
     
     try {
-      // Save prescription (uploads to backend)
+      // Save prescription (uploads to Supabase Storage)
       const { data: prescriptionData, error: uploadError } = await savePrescription(file);
 
       if (uploadError) {
-        throw new Error(uploadError);
+        throw uploadError;
       }
 
       if (prescriptionData) {
         setCurrentPrescriptionId(prescriptionData.id);
+        
+        // Check if analysis was completed
+        if (prescriptionData.analysis_results) {
+          setAnalysisResult(prescriptionData.analysis_results);
+          toast({
+            title: "Success",
+            description: "Prescription uploaded and analyzed successfully"
+          });
+        } else {
+          toast({
+            title: "Upload successful",
+            description: "Prescription uploaded. Analysis in progress..."
+          });
+        }
       }
-
-      toast({
-        title: "Upload successful",
-        description: "Prescription image uploaded successfully"
-      });
-
-      // Note: Prescription analysis requires additional backend setup with AI service
-      setAnalysisResult({
-        medications: [{
-          name: "Analysis pending",
-          dosageForm: "Please configure AI service in backend",
-          dosage: "N/A",
-          frequency: "N/A",
-          duration: "N/A",
-          sideEffects: ["Check backend logs for details"],
-          interactions: ["AI analysis not configured"]
-        }]
-      });
     } catch (error: any) {
       console.error('Upload error:', error);
       toast({
@@ -225,15 +221,7 @@ const Prescription = () => {
                   {isUploading && (
                     <div className="flex items-center justify-center space-x-3 bg-blue-50 p-6 rounded-xl">
                       <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                      <span className="text-lg font-medium text-blue-700">Uploading prescription...</span>
-                    </div>
-                  )}
-                  
-                  {/* Analysis Progress */}
-                  {isAnalyzing && !isUploading && (
-                    <div className="flex items-center justify-center space-x-3 bg-green-50 p-6 rounded-xl">
-                      <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-                      <span className="text-lg font-medium text-green-700">Analyzing prescription...</span>
+                      <span className="text-lg font-medium text-blue-700">Uploading and analyzing prescription...</span>
                     </div>
                   )}
                 </div>
@@ -242,7 +230,7 @@ const Prescription = () => {
           </Card>
 
           {/* Analysis Results */}
-          {analysisResult && (
+          {analysisResult && analysisResult.medications && (
             <div className="space-y-6">
               <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Analysis Results</h2>
               
@@ -264,27 +252,31 @@ const Prescription = () => {
                   </CardHeader>
                   
                   <CardContent className="p-6 space-y-6">
-                    <div>
-                      <h4 className="font-bold text-lg mb-3 text-gray-800">Side Effects</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {med.sideEffects.map((effect: string, i: number) => (
-                          <span key={i} className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                            {effect}
-                          </span>
-                        ))}
+                    {med.sideEffects && med.sideEffects.length > 0 && (
+                      <div>
+                        <h4 className="font-bold text-lg mb-3 text-gray-800">Side Effects</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {med.sideEffects.map((effect: string, i: number) => (
+                            <span key={i} className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                              {effect}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
-                    <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
-                      <h4 className="font-bold text-lg text-blue-800 mb-3">Drug Interactions</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {med.interactions.map((interaction: string, i: number) => (
-                          <span key={i} className="bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                            {interaction}
-                          </span>
-                        ))}
+                    {med.interactions && med.interactions.length > 0 && (
+                      <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                        <h4 className="font-bold text-lg text-blue-800 mb-3">Drug Interactions</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {med.interactions.map((interaction: string, i: number) => (
+                            <span key={i} className="bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                              {interaction}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}

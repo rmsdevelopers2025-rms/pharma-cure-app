@@ -1,15 +1,10 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { API_ENDPOINTS, getAuthHeaders, setAuthToken, removeAuthToken, getAuthToken } from '@/config/api';
-
-interface User {
-  id: string;
-  email: string;
-  full_name?: string;
-}
+import { supabase } from '@/integrations/supabase/client';
+import type { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
-  session: { token: string } | null;
+  session: Session | null;
   signUp: (email: string, password: string, fullName: string, sex: string, age: number, height: number, weight: number, medicalInformation: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -28,96 +23,62 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<{ token: string } | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing token
-    const checkAuth = async () => {
-      const token = getAuthToken();
-      if (token) {
-        try {
-          const response = await fetch(API_ENDPOINTS.ME, {
-            headers: getAuthHeaders(),
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            setUser(data.user);
-            setSession({ token });
-          } else {
-            removeAuthToken();
-          }
-        } catch (error) {
-          console.error('Auth check failed:', error);
-          removeAuthToken();
-        }
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
       }
-      setLoading(false);
-    };
+    );
 
-    checkAuth();
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string, sex: string, age: number, height: number, weight: number, medicalInformation: string) => {
-    try {
-      const response = await fetch(API_ENDPOINTS.SIGNUP, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          fullName,
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          full_name: fullName,
           sex,
           age,
           height,
           weight,
-          medicalInformation,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: { message: data.error || 'Failed to sign up' } };
+          medical_information: medicalInformation,
+        }
       }
-
-      setAuthToken(data.token);
-      setUser(data.user);
-      setSession({ token: data.token });
-      return { error: null };
-    } catch (error: any) {
-      return { error: { message: error.message || 'Network error' } };
-    }
+    });
+    
+    return { error };
   };
 
   const signIn = async (email: string, password: string) => {
-    try {
-      const response = await fetch(API_ENDPOINTS.SIGNIN, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: { message: data.error || 'Failed to sign in' } };
-      }
-
-      setAuthToken(data.token);
-      setUser(data.user);
-      setSession({ token: data.token });
-      return { error: null };
-    } catch (error: any) {
-      return { error: { message: error.message || 'Network error' } };
-    }
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    return { error };
   };
 
   const signOut = async () => {
-    removeAuthToken();
-    setUser(null);
-    setSession(null);
+    await supabase.auth.signOut();
   };
 
   const value = {

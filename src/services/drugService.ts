@@ -1,17 +1,16 @@
-import { API_ENDPOINTS } from '@/config/api';
+import { supabase } from '@/integrations/supabase/client';
 import { Drug, DrugComposition, Pharmacokinetics } from '@/data/drugDatabase';
 
-// Convert API response to Drug interface
+// Transform Supabase data to Drug interface
 const transformDrugData = (row: any): Drug => ({
-  name: row.name,
-  genericName: row.generic_name,
+  name: row.name || '',
+  genericName: row.generic_name || '',
   brands: row.brands || [],
   composition: row.composition || [],
   sideEffects: row.side_effects || [],
   dosageForms: row.dosage_forms || [],
   disorders: row.disorders || [],
   incompatibility: row.incompatibility || [],
-  
   category: row.category || '',
   therapeuticClass: row.therapeutic_class || '',
   pharmacologicalClass: row.pharmacological_class || '',
@@ -41,15 +40,14 @@ export const searchDrugs = async (query: string): Promise<Drug[]> => {
   if (!query.trim()) return [];
   
   try {
-    const response = await fetch(`${API_ENDPOINTS.SEARCH_DRUGS}?q=${encodeURIComponent(query)}`);
+    const { data, error } = await supabase.rpc('search_drugs', { q: query });
     
-    if (!response.ok) {
-      console.error('Drug search error');
+    if (error) {
+      console.error('Drug search error:', error);
       return [];
     }
     
-    const data = await response.json();
-    return data?.map(transformDrugData) || [];
+    return (data || []).map(transformDrugData);
   } catch (error) {
     console.error('Drug search error:', error);
     return [];
@@ -60,14 +58,14 @@ export const getAutoCorrectSuggestion = async (query: string): Promise<string | 
   if (!query.trim()) return null;
   
   try {
-    const response = await fetch(`${API_ENDPOINTS.DRUG_AUTOCORRECT}?q=${encodeURIComponent(query)}`);
+    const { data, error } = await supabase.rpc('get_auto_correct_suggestion', { q: query });
     
-    if (!response.ok) {
+    if (error) {
+      console.error('Auto-correct error:', error);
       return null;
     }
     
-    const data = await response.json();
-    return data.suggestion;
+    return data;
   } catch (error) {
     console.error('Auto-correct error:', error);
     return null;
@@ -78,14 +76,18 @@ export const getDrugSuggestions = async (query: string): Promise<string[]> => {
   if (!query.trim()) return [];
   
   try {
-    const response = await fetch(`${API_ENDPOINTS.DRUG_SUGGESTIONS}?q=${encodeURIComponent(query)}`);
+    const { data, error } = await supabase
+      .from('drugs')
+      .select('name')
+      .ilike('name', `%${query}%`)
+      .limit(5);
     
-    if (!response.ok) {
+    if (error) {
+      console.error('Suggestions error:', error);
       return [];
     }
     
-    const data = await response.json();
-    return data || [];
+    return data?.map(d => d.name) || [];
   } catch (error) {
     console.error('Suggestions error:', error);
     return [];

@@ -5,7 +5,7 @@ import { Calendar, Clock, Search, User, MapPin, Stethoscope } from 'lucide-react
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { API_ENDPOINTS, getAuthHeaders } from '@/config/api';
+import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import DrugReminder from '@/components/DrugReminder';
 
@@ -18,18 +18,20 @@ const Dashboard = () => {
     const fetchUserName = async () => {
       if (user) {
         try {
-          const response = await fetch(API_ENDPOINTS.PROFILE, {
-            headers: getAuthHeaders(),
-          });
+          const { data } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', user.id)
+            .single();
           
-          if (response.ok) {
-            const data = await response.json();
-            if (data.full_name) {
-              setUserName(data.full_name);
-            }
+          if (data?.full_name) {
+            setUserName(data.full_name);
+          } else {
+            setUserName(user.email?.split('@')[0] || 'User');
           }
         } catch (error) {
           console.error('Error fetching user name:', error);
+          setUserName(user.email?.split('@')[0] || 'User');
         }
       }
     };
