@@ -8,6 +8,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { useBackspaceNavigation } from "./hooks/useBackspaceNavigation";
+import { useSwipeNavigation } from "./hooks/useSwipeNavigation";
 import SplashScreen from "./pages/SplashScreen";
 import GetStarted from "./pages/GetStarted";
 import SignIn from "./pages/SignIn";
@@ -24,6 +25,7 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   useBackspaceNavigation();
+  useSwipeNavigation();
   
   return (
     <>
