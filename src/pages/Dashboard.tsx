@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import DrugReminder from '@/components/DrugReminder';
+import { OnboardingTutorial } from '@/components/OnboardingTutorial';
+import { OnboardingButton } from '@/components/OnboardingButton';
 
 const Dashboard = () => {
   const [userName, setUserName] = useState('User');
@@ -42,34 +44,38 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
+      <OnboardingTutorial />
       
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <div className="max-w-6xl mx-auto">
           {/* Welcome Section */}
-          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 shadow-lg border border-gray-200">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 flex-shrink-0">
-                <img 
-                  src="/lovable-uploads/b5751d8a-2aa5-4a0f-98b6-4a3ef09935da.png" 
-                  alt="PharmaCure Logo" 
-                  className="w-full h-full object-contain"
-                />
+          <div id="dashboard-welcome" className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 shadow-lg border border-gray-200">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between space-y-3 sm:space-y-0 sm:space-x-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 flex-shrink-0">
+                  <img 
+                    src="/lovable-uploads/b5751d8a-2aa5-4a0f-98b6-4a3ef09935da.png" 
+                    alt="PharmaCure Logo" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="text-center sm:text-left">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
+                    Welcome back, <span className="text-blue-600">{userName}</span>!
+                  </h1>
+                  <p className="text-sm sm:text-base lg:text-lg text-gray-600 mt-1">
+                    {t('slogan')}
+                  </p>
+                </div>
               </div>
-              <div className="text-center sm:text-left">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
-                  Welcome back, <span className="text-blue-600">{userName}</span>!
-                </h1>
-                <p className="text-sm sm:text-base lg:text-lg text-gray-600 mt-1">
-                  {t('slogan')}
-                </p>
-              </div>
+              <OnboardingButton />
             </div>
           </div>
 
           {/* Quick Actions Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
             {/* Search */}
-            <Link to="/search" className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-5 lg:p-6 flex items-center space-x-3 sm:space-x-4 hover:scale-[1.02] border border-gray-200">
+            <Link id="nav-search" to="/search" className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-5 lg:p-6 flex items-center space-x-3 sm:space-x-4 hover:scale-[1.02] border border-gray-200">
               <div className="p-2 sm:p-3 lg:p-4 bg-blue-100 text-blue-600 rounded-lg sm:rounded-xl flex-shrink-0">
                 <Search className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
               </div>
@@ -80,7 +86,7 @@ const Dashboard = () => {
             </Link>
 
             {/* Profile */}
-            <Link to="/profile" className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-5 lg:p-6 flex items-center space-x-3 sm:space-x-4 hover:scale-[1.02] border border-gray-200">
+            <Link id="nav-profile" to="/profile" className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-5 lg:p-6 flex items-center space-x-3 sm:space-x-4 hover:scale-[1.02] border border-gray-200">
               <div className="p-2 sm:p-3 lg:p-4 bg-green-100 text-green-600 rounded-lg sm:rounded-xl flex-shrink-0">
                 <User className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
               </div>
@@ -91,7 +97,7 @@ const Dashboard = () => {
             </Link>
 
             {/* Prescription */}
-            <Link to="/prescription" className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-5 lg:p-6 flex items-center space-x-3 sm:space-x-4 hover:scale-[1.02] border border-gray-200">
+            <Link id="nav-prescription" to="/prescription" className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-5 lg:p-6 flex items-center space-x-3 sm:space-x-4 hover:scale-[1.02] border border-gray-200">
               <div className="p-2 sm:p-3 lg:p-4 bg-yellow-100 text-yellow-600 rounded-lg sm:rounded-xl flex-shrink-0">
                 <Stethoscope className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
               </div>
@@ -102,7 +108,7 @@ const Dashboard = () => {
             </Link>
 
             {/* Nearby Pharmacies */}
-            <Link to="/nearby-pharmacies" className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-5 lg:p-6 flex items-center space-x-3 sm:space-x-4 hover:scale-[1.02] border border-gray-200">
+            <Link id="nav-pharmacies" to="/nearby-pharmacies" className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-5 lg:p-6 flex items-center space-x-3 sm:space-x-4 hover:scale-[1.02] border border-gray-200">
               <div className="p-2 sm:p-3 lg:p-4 bg-red-100 text-red-600 rounded-lg sm:rounded-xl flex-shrink-0">
                 <MapPin className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
               </div>
